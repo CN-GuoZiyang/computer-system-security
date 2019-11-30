@@ -26,13 +26,13 @@ int main()
     {
         char * errnoMeg = strerror(errno);
         printf("Fork fork error! %s\n", errnoMeg);
-    } else if(pid ==0) 
+    } else if(pid == 0) 
     {
-        if(execl(strcat(cwd, "/fork"), (char*)0) < 0)
-        {
-            char * errnoMeg = strerror(errno);
-            printf("Invoke fork error! %s\n", errnoMeg);
-        }
+        uid_t nruid, neuid, nsuid;
+        getresuid(&nruid, &neuid, &nsuid);
+        printf("Process fork, pid=%d\nruid=%d\neuid=%d\nsuid=%d\n", 
+            getpid(), nruid, neuid, nsuid);
+        
     }else 
     {
         int stat_val;
@@ -46,7 +46,7 @@ int main()
         printf("Fork process error! %s\n", errnoMeg);
     } else if(pid == 0) 
     {
-        if(execl(strcat(cwd, "/setuid"), (char*)0) < 0)
+        if(execl(strcat(cwd, "/setuid.o"), (char*)0) < 0)
         {
             char * errnoMeg = strerror(errno);
             printf("Invoke setuid error! %s\n", errnoMeg);

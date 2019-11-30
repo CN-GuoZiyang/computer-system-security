@@ -11,21 +11,20 @@ chmod a+x cal.exe
 
 chmod 664 demo.txt
 
-cp ./cal.exe ./netmonitor.exe
-chmod 4711 netmonitor
+cp cal.exe netmonitor.exe
+chmod 4711 netmonitor.exe
 
-gcc main1.c -o main1
-gcc fork.c -o fork
+gcc main1.c -o main1.o
 
-sudo gcc setuid.c -o setuid
-sudo chmod 4711 setuid
+sudo gcc setuid.c -o setuid.o
+sudo chmod 4711 setuid.o
 
-sudo gcc httpService.c -o httpService
-sudo chmod 700 httpService
+sudo gcc httpService.c -o httpService.o
+sudo chmod 700 httpService.o
 
-gcc echo.c -o ./echo
+gcc echo.c -o echo.o
 
-sudo gcc kill.c -o ./kill
-sudo chmod 700 ./kill
+sudo gcc kill.c -o kill.o
+sudo chmod 700 kill.o
 
-echo "各文件编译完成，请在本目录下执行main1"
+echo "各文件编译完成，请在本目录下执行main1.o"

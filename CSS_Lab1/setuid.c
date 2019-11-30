@@ -28,7 +28,7 @@ int main()
         printf("Fork process error! %s\n", errnoMeg);
     } else if(pid == 0) 
     {
-        if(execl(strcat(cwd, "/httpService"), (char*)0) < 0)
+        if(execl(strcat(cwd, "/httpService.o"), (char*)0) < 0)
         {
             char* errnoMeg = strerror(errno);
             printf("Invoke httpService error! %s\n", errnoMeg);
@@ -38,10 +38,7 @@ int main()
         sprintf(httpServicePid, "%d", pid);
     }
 
-    /* 
-        临时收回权限
-        将euid设置为ruid，并将之前的euid保存在suid里
-    */
+    //临时放弃权限
     setresuid(ruid, ruid, euid);
     printf("Revoke permission temporarily\n");
     getresuid(&ruid, &euid, &suid);
@@ -55,7 +52,7 @@ int main()
         printf("Fork echo error! %s\n", errnoMeg);
     } else if(pid == 0) 
     {
-        if(execl(strcat(cwd, "/echo"), "ziyang", (char*)0) < 0)
+        if(execl(strcat(cwd, "/echo.o"), "ziyang", (char*)0) < 0)
         {
             char* errnoMeg = strerror(errno);
             printf("Invoke echo error! %s\n", errnoMeg);
@@ -75,7 +72,7 @@ int main()
     {
         // 定义环境变量
         char* env[] = {"USER=ziyang", "PATH=/home/ziyang/Documents/computer-system-security", (char*)0};
-        if(execle(strcat(cwd, "/echo"), "ziyang", (char*)0, env) < 0)
+        if(execle(strcat(cwd, "/echo.o"), "ziyang", (char*)0, env) < 0)
         {
             char* errnoMeg = strerror(errno);
             printf("Invoke echo error! %s\n", errnoMeg);
@@ -100,7 +97,7 @@ int main()
     } else if(pid == 0) 
     {
         // 原始环境变量太长，使用较短的替换
-        if(execle(strcat(cwd, "/kill"), "", httpServicePid, (char*)0) < 0)
+        if(execle(strcat(cwd, "/kill.o"), "", httpServicePid, (char*)0) < 0)
         {
             char* errnoMeg = strerror(errno);
             printf("Invoke kill error! %s\n", errnoMeg);
