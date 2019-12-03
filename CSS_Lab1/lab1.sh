@@ -27,4 +27,7 @@ gcc echo.c -o echo.o
 sudo gcc kill.c -o kill.o
 sudo chmod 700 kill.o
 
+sudo gcc mychroot.c -o mychroot.o
+sudo chmod 4711 mychroot.o
+
 echo "各文件编译完成，请在本目录下执行main1.o"

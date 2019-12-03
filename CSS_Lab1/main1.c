@@ -32,6 +32,7 @@ int main()
         getresuid(&nruid, &neuid, &nsuid);
         printf("Process fork, pid=%d\nruid=%d\neuid=%d\nsuid=%d\n", 
             getpid(), nruid, neuid, nsuid);
+        return 0;
         
     }else 
     {
