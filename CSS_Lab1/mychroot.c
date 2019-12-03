@@ -12,7 +12,7 @@ int main()
     getresuid(&ruid, &euid, &suid);
     printf("Before chroot:\nruid=%d\neuid=%d\nsuid=%d\n", ruid, euid, suid);
     printf("change dir\n");
-    //chdir("/home/ziyang/chroot");
+    chdir("/home/ziyang/chroot");
     printf("Change root\n");
     if(chroot("/home/ziyang/chroot") == 0) {
         printf("change root succeed!\n");
