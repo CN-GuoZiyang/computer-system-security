@@ -6,3 +6,5 @@ sudo echo "获取成功"
 
 sudo rm ./passwd
 sudo chmod 666 ./aaa
+
+sudo rm ./capset

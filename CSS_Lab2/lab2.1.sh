@@ -9,3 +9,6 @@ sudo chmod 4711 ./passwd
 
 sudo chown root:root aaa
 sudo chmod 600 ./aaa
+
+sudo gcc capset.c -o capset -lcap
+sudo chmod 4711 capset
