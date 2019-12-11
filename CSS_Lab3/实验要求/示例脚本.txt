@@ -1,0 +1,150 @@
+/*
+*此脚本仅供参考，免不了有疏漏或者错误之处，
+*
+*因为作者小水没有学好数据库
+*/
+
+
+一、建立数据表
+
+1、建立course_info表
+
+CREATE  TABLE `ex`.`course_info` ( 
+  `c_id` INT NOT NULL , 
+  `c_name` VARCHAR(255) NULL , 
+  `c_category` ENUM('必修','限选','任选') NULL , 
+  `c_credit` INT NULL ,  
+  `c_department` VARCHAR(255) NULL ,  
+  `c_note` VARCHAR(255) NULL ,  
+  PRIMARY KEY (`c_id`) );
+
+2、建立student_info表
+
+CREATE  TABLE `ex`.`student_info` (
+  `s_id` INT NOT NULL ,  `s_name` VARCHAR(45) NULL ,
+  `s_gender` ENUM('female','male') NULL DEFAULT 'male' ,
+  `s_birthday` DATE NULL ,
+  `s_class` INT NULL ,
+  `s_department` VARCHAR(255) NULL ,
+  `s_admission_date` DATE NULL ,
+  `s_addr` VARCHAR(255) NULL ,
+  PRIMARY KEY (`s_id`) );
+
+3、建立teacher_info表
+
+CREATE  TABLE `ex`.`teacher_info` (
+  `t_id` INT NOT NULL ,
+  `t_name` VARCHAR(255) NULL ,
+  `t_gender` ENUM('female','male') NULL DEFAULT 'male' ,  `t_birthday` DATE NULL ,
+  `t_title` VARCHAR(255) NULL ,
+  `t_department` VARCHAR(255) NULL ,
+  `t_addr` VARCHAR(255) NULL ,
+  PRIMARY KEY (`t_id`) );
+
+4、建立re_t_c表
+
+CREATE  TABLE `ex`.`re_t_c` (
+  `tc_cid` INT NOT NULL ,
+  `tc_tid` INT NOT NULL ,
+  `tc_term` ENUM('春季','秋季') NULL ,
+  PRIMARY KEY (`tc_cid`, `tc_tid`) );
+
+
+5、建立re_s_c表
+
+CREATE  TABLE `ex`.`re_s_c` (
+  `sc_cid` INT NOT NULL ,
+  `sc_sid` INT NOT NULL ,
+  `sc_score` INT NULL ,
+  `sc_note` VARCHAR(255) NULL ,
+  PRIMARY KEY (`sc_cid`, `sc_sid`) );
+
+
+
+二、创建sql函数（网摘示例）
+
+1、示例
+mysql>
+mysql> delimiter $$
+mysql>
+mysql> CREATE FUNCTION myFunction
+    ->    (in_string      VARCHAR(255),
+    ->     in_find_str    VARCHAR(20),
+    ->     in_repl_str    VARCHAR(20))
+    ->
+    ->   RETURNS VARCHAR(255)
+    -> BEGIN
+    ->   DECLARE l_new_string VARCHAR(255);
+    ->   DECLARE l_find_pos   INT;
+    ->
+    ->   SET l_find_pos=INSTR(in_string,in_find_str);
+    ->
+    ->   IF (l_find_pos>0) THEN
+    ->     SET l_new_string=INSERT(in_string,l_find_pos,LENGTH(in_find_str),in_repl_str);
+    ->   ELSE
+    ->     SET l_new_string=in_string;
+    ->   END IF;
+    ->   RETURN(l_new_string);
+    ->
+    -> END$$
+Query OK, 0 rows affected (0.00 sec)
+
+mysql>
+mysql> delimiter ;
+mysql> select myFunction('ABC','A','Z');
++---------------------------+
+| myFunction('ABC','A','Z') |
++---------------------------+
+| ZBC                       |
++---------------------------+
+1 row in set (0.00 sec)
+
+mysql> drop function myFunction;
+Query OK, 0 rows affected (0.00 sec)
+
+
+2、小水的函数申明（未成功）
+
+delimiter $$
+
+create function register_student
+    (in_s_id    int(11),
+     in_s_name  varchar(45),
+     in_s_gender    enum('female', 'male'),
+     in_s_birthday  date,
+     in_s_class int(11),
+     in_s_department    varchar(255),
+     in_s_admission_date    date,
+     in_s_addr  varchar(255),
+     in_s_pw    varchar(255))
+     
+    returns int(11)
+begin
+    declare n int;
+    
+    set n = select count(*) from student_info where s_id = in_s_id;  /* select 处有误，小水注*/
+    if (n == 0) then
+        insert into student_info values (in_s_id, in_s_name, in_s_gender, in_s_birthday, in_s_class, in_s_department, in_s_admission_date, in_s_addr);
+        grant XXX on  `ex`.`student_info`
+            to to char(in_s_id)@'%'
+            identified by in_s_pw;
+    else
+        return 0;
+    end if;
+    return in_s_id;
+    
+end$$
+
+
+3、不厌其烦的单条语句实现
+（root）下
+insert into student_info values (100, 'hky', 'male', 19890512, 0803201, 'cs', 20080826, 'cqbsjlx');
+
+create user 'hky'@'%' identified by 'hky';
+
+grant update on  `ex`.`student_info` to 'hky'@'%';
+
+看看结果，(hky)下
+use ex;
+select * from student_info;  (ok)
+delete  from student_info where s_id = 100;  (denied)
