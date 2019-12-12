@@ -1,11 +1,12 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron')
+const {app, BrowserWindow, ipcMain, Menu} = require('electron')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
 function createWindow () {
+  Menu.setApplicationMenu(null)
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
@@ -67,26 +68,3 @@ ipcMain.on('return_login', (event, arg) => {
 ipcMain.on('getUser', (event) => {
   event.sender.send('username', currentUser)
 })
-
-let net = require('net');
-let listen_port = 8080
-let server = net.createServer((socket) => {
-  socket.setEncoding('utf8')
-  socket.on('data', (data_str) => {
-    let data = JSON.parse(data_str)
-    if(data.username != currentUser) {
-      socket.write(JSON.stringify({
-        code: -1,
-        money: 90
-      }))
-    } else {
-      socket.write(JSON.stringify({
-        code: 0,
-        money: 100
-      }))
-    }
-  })
-}).listen(listen_port)
-server.on('listening',function(){
-  console.log("server listening:" + server.address().port);
-});
