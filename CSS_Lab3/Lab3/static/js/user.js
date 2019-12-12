@@ -52,7 +52,7 @@ deposit_confirm_dialog.addEventListener('click', (e) => {
     client.on('data', (data) => {
         result = JSON.parse(data)
         if(result.code != 0) {
-            window.alert('操作失败！')
+            window.alert('操作失败！' + result.msg)
         }
         deposit_dialog.close()
         currency.innerHTML = result.money
@@ -92,7 +92,7 @@ withdraw_confirm_dialog.addEventListener('click', (e) => {
     }
     
     let client= new net.Socket();
-    client.setEncoding('binary')
+    client.setEncoding('utf8')
     client.connect(admin_port, admin_host, () => {
         client.write(JSON.stringify({
             username: username,
@@ -104,7 +104,7 @@ withdraw_confirm_dialog.addEventListener('click', (e) => {
     client.on('data', (data) => {
         result = JSON.parse(data)
         if(result.code != 0) {
-            window.alert('操作失败！')
+            window.alert('操作失败！' + result.msg)
         }
         withdraw_dialog.close()
         currency.innerHTML = result.money

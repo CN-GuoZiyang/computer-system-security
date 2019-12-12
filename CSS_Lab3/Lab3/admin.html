@@ -83,6 +83,19 @@
       </section>
     </main>
   </div>
+
+  <dialog class="mdl-dialog" id="confirm_dialog">
+    <h4 class="mdl-dialog__title">请求操作</h4>
+    <div class="mdl-dialog__content">
+      <p>用户 <span id="dialog_username"></span> 请求 <span id="dialog_operation"></span> <span id="dialog_money"></span>元</p>
+      <p>该用户当前余额为 <span id="dialog_currency"></span></p>
+    </div>
+    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+      <button type="button" class="mdl-button" id="confirm_dialog_ok">允许</button>
+      <button type="button" class="mdl-button close" id="confirm_dialog_no">不允许</button>
+    </div>
+  </dialog>
+
 </body>
 
 <script src="./static/js/material.min.js"></script>
