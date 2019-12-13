@@ -8,7 +8,7 @@ let confirm_dialog = document.querySelector("#confirm_dialog")
 document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
   confirm_dialog.close()
   //TODO 执行操作
-
+  
   current_user_socket.write(JSON.stringify({
 
   }))
@@ -31,8 +31,8 @@ let server = net.createServer((socket) => {
   socket.on('data', (data_str) => {
     let data = JSON.parse(data_str)
 
-    //let personal_currency = find_currency_by_username(data.username)
-    let personal_currency = 20
+    let personal_currency = find_currency_by_username(data.username)
+    
     if(data.operation == 'withdraw' && personal_currency > money) {
       socket.write({
         code: -1,
@@ -63,5 +63,5 @@ return_login.addEventListener('click', (e) => {
 
 // TODO 按照data中的username查找余额
 function find_currency_by_username(name) {
-
+  return 20
 }
