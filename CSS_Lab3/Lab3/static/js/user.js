@@ -1,5 +1,6 @@
 let ipcRenderer = require('electron').ipcRenderer
 let net = require('net')
+let mysql = require('mysql')
 let admin_port = 8080
 let admin_host = '127.0.0.1'
 
@@ -11,12 +12,48 @@ return_login.addEventListener('click', (e) => {
     ipcRenderer.send('return_login')
 })
 
-ipcRenderer.on('username', (event, arg) => {
-    username = arg
-    document.querySelector('#username').innerHTML = username
+let no_user_back = document.querySelector('#common_error_back')
+no_user_back.addEventListener('click', (e) => {
+    ipcRenderer.send('return_login')
 })
 
-ipcRenderer.send('getUser');
+username = ipcRenderer.sendSync('getUser');
+document.querySelector('#username').innerHTML = username
+
+let connection = mysql.createConnection({
+    host: 'localhost',
+    user: username,
+    password: username,
+    database: 'lab3'
+})
+
+connection.connect((error) => {
+    if(error) {
+        document.querySelector('#common_error_msg').innerHTML = '无此用户！'
+        document.querySelector('#common_error_dialog').showModal()
+    }
+})
+
+let currency_select_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + username + '\''
+connection.query(currency_select_sql, (error, result) => {
+    if (result.length == 0) {
+        document.querySelector('#common_error_msg').innerHTML = '该用户条目未被添加至bank中！'
+        document.querySelector('#common_error_dialog').showModal()
+    } else {
+        currency.innerHTML = result[0].currency
+    }
+})
+
+document.querySelector('#refresh_currency').addEventListener('click', (e) => {
+    connection.query(currency_select_sql, (error, result) => {
+        if (result.length == 0) {
+            document.querySelector('#common_error_msg').innerHTML = '该用户条目未被添加至bank中！'
+            document.querySelector('#common_error_dialog').showModal()
+        } else {
+            currency.innerHTML = result[0].currency
+        }
+    })
+})
 
 let deposit_btn = document.querySelector("#deposit")
 let deposit_dialog = document.querySelector("#deposit_dialog")

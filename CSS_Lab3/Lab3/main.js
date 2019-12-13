@@ -66,5 +66,5 @@ ipcMain.on('return_login', (event, arg) => {
 })
 
 ipcMain.on('getUser', (event) => {
-  event.sender.send('username', currentUser)
+  event.returnValue = currentUser
 })

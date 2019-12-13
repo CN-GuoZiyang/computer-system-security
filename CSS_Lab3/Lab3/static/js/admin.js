@@ -1,9 +1,24 @@
 let ipcRenderer = require('electron').ipcRenderer
+let mysql = require('mysql')
 let return_login = document.querySelector('#return_login')
 
 let current_msg
 let current_user_socket
 let confirm_dialog = document.querySelector("#confirm_dialog")
+
+let connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'root',
+  database: 'lab3'
+})
+
+connection.connect()
+
+let query_all_info = 'SELECT id, username, Table_priv FROM lab3.bank,mysql.tables_priv WHERE lab3.bank.username = mysql.tables_priv.User'
+connection.query(query_all_info, (error, result) => {
+  
+})
 
 document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
   confirm_dialog.close()

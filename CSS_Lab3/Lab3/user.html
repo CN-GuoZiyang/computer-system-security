@@ -42,7 +42,7 @@
                   当前用户：<span id="username"></span>
                 </div>
                 <div class="text_div">
-                  当前余额：¥<span id="currency">10</span>
+                  当前余额：¥<span id="currency"></span>  <a class="material-icons" id="refresh_currency">refresh</a>
                 </div>
               </div>
             </div>
@@ -118,6 +118,17 @@
           确定
         </button>
         <button type="button" id="withdraw_close_dialog" class="mdl-button">返回</button>
+      </div>
+    </dialog>
+
+    <dialog class="mdl-dialog" id="common_error_dialog">
+      <div class="mdl-dialog__content">
+        <p id='common_error_msg'>
+          无此用户！
+        </p>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" id="common_error_back" class="mdl-button">返回</button>
       </div>
     </dialog>
   </body>
