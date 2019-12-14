@@ -13,11 +13,17 @@ let connection = mysql.createConnection({
   database: 'lab3'
 })
 
-connection.connect()
-
-let query_all_info = 'SELECT id, username, Table_priv FROM lab3.bank,mysql.tables_priv WHERE lab3.bank.username = mysql.tables_priv.User'
-connection.query(query_all_info, (error, result) => {
+connection.connect((error) => {
   
+})
+
+let query_all_info = 'SELECT id, username, valid, Table_priv FROM lab3.bank,mysql.tables_priv WHERE lab3.bank.username = mysql.tables_priv.User ORDER BY id'
+connection.query(query_all_info, (error, result) => {
+  if(error) {
+    console.log(error)
+  } else {
+    console.log(result)
+  }
 })
 
 document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {

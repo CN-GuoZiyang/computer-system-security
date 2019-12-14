@@ -34,9 +34,12 @@ connection.connect((error) => {
     }
 })
 
-let currency_select_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + username + '\''
+let currency_select_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + username + '\' and valid=true'
 connection.query(currency_select_sql, (error, result) => {
-    if (result.length == 0) {
+    if(error) {
+        document.querySelector('#common_error_msg').innerHTML = '出现未知错误！' + error
+        document.querySelector('#common_error_dialog').showModal()
+    } else if (result.length == 0) {
         document.querySelector('#common_error_msg').innerHTML = '该用户条目未被添加至bank中！'
         document.querySelector('#common_error_dialog').showModal()
     } else {
