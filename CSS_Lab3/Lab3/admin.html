@@ -3,8 +3,8 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
-  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src *" />
+  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src *" />
   <link rel="stylesheet" href="./static/css/material.min.css" />
   <link rel="stylesheet" href="./static/css/admin.css" />
   <title>管理员界面</title>
@@ -33,7 +33,7 @@
                 <th class="mdl-data-table__cell--non-numeric">余额</th>
                 <th class="mdl-data-table__cell--non-numeric">Select</th>
                 <th class="mdl-data-table__cell--non-numeric">Update</th>
-                <th class="mdl-data-table__cell--non-numeric">删除</th>
+                <th class="mdl-data-table__cell--non-numeric">有效</th>
               </tr>
             </thead>
             <tbody id="data_table_body">
@@ -104,11 +104,20 @@
   <dialog class="mdl-dialog" id="common_error_dialog">
     <div class="mdl-dialog__content">
       <p id='common_error_msg'>
-        无此用户！
       </p>
     </div>
     <div class="mdl-dialog__actions">
       <button type="button" id="common_error_back" class="mdl-button">返回</button>
+    </div>
+  </dialog>
+
+  <dialog class="mdl-dialog" id="common_error_dialog_noreturn">
+    <div class="mdl-dialog__content">
+      <p id='common_error_msg_noreturn'>
+      </p>
+    </div>
+    <div class="mdl-dialog__actions">
+      <button type="button" id="common_error_noreturn" class="mdl-button">确定</button>
     </div>
   </dialog>
 
