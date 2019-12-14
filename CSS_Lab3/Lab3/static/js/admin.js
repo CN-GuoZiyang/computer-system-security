@@ -1,10 +1,14 @@
 let ipcRenderer = require('electron').ipcRenderer
 let mysql = require('mysql')
-let return_login = document.querySelector('#return_login')
 
 let current_msg
 let current_user_socket
 let confirm_dialog = document.querySelector("#confirm_dialog")
+
+let no_user_back = document.querySelector('#common_error_back')
+no_user_back.addEventListener('click', (e) => {
+  ipcRenderer.send('return_login')
+})
 
 let connection = mysql.createConnection({
   host: 'localhost',
@@ -14,22 +18,37 @@ let connection = mysql.createConnection({
 })
 
 connection.connect((error) => {
-  
+  if (error) {
+    document.querySelector('#common_error_msg').innerHTML = '无法连接数据库！' + error
+    document.querySelector('#common_error_dialog').showModal()
+  }
 })
 
 let query_all_info = 'SELECT id, username, valid, Table_priv FROM lab3.bank,mysql.tables_priv WHERE lab3.bank.username = mysql.tables_priv.User ORDER BY id'
 connection.query(query_all_info, (error, result) => {
-  if(error) {
-    console.log(error)
+  if (error) {
+    if (error) {
+      document.querySelector('#common_error_msg').innerHTML = '未知错误！' + error
+      document.querySelector('#common_error_dialog').showModal()
+    }
   } else {
-    console.log(result)
+    if(result.length == 0) return
+    else {
+      
+    }
   }
+})
+
+let return_login = document.querySelector('#return_login')
+return_login.addEventListener('click', (e) => {
+  ipcRenderer.send('return_login')
+  server.close()
 })
 
 document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
   confirm_dialog.close()
   //TODO 执行操作
-  
+
   current_user_socket.write(JSON.stringify({
 
   }))
@@ -53,8 +72,8 @@ let server = net.createServer((socket) => {
     let data = JSON.parse(data_str)
 
     let personal_currency = find_currency_by_username(data.username)
-    
-    if(data.operation == 'withdraw' && personal_currency > money) {
+
+    if (data.operation == 'withdraw' && personal_currency > money) {
       socket.write({
         code: -1,
         money: personal_currency
@@ -73,14 +92,9 @@ let server = net.createServer((socket) => {
 
   })
 }).listen(listen_port)
-server.on('listening',function(){
+server.on('listening', function () {
   console.log("server listening:" + server.address().port);
 });
-
-return_login.addEventListener('click', (e) => {
-    ipcRenderer.send('return_login')
-    server.close()
-})
 
 // TODO 按照data中的username查找余额
 function find_currency_by_username(name) {

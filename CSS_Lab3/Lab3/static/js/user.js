@@ -28,7 +28,7 @@ let connection = mysql.createConnection({
 })
 
 connection.connect((error) => {
-    if(error) {
+    if (error) {
         document.querySelector('#common_error_msg').innerHTML = '无此用户！'
         document.querySelector('#common_error_dialog').showModal()
     }
@@ -36,7 +36,7 @@ connection.connect((error) => {
 
 let currency_select_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + username + '\' and valid=true'
 connection.query(currency_select_sql, (error, result) => {
-    if(error) {
+    if (error) {
         document.querySelector('#common_error_msg').innerHTML = '出现未知错误！' + error
         document.querySelector('#common_error_dialog').showModal()
     } else if (result.length == 0) {
@@ -74,12 +74,12 @@ deposit_close_dialog.addEventListener('click', (e) => {
 })
 deposit_confirm_dialog.addEventListener('click', (e) => {
     let money = deposit_money.value
-    if(typeof money == 'undefined' || money == null || money == '' || !/^[0-9]*$/.test(money) || parseFloat(money) <= 0) {
+    if (typeof money == 'undefined' || money == null || money == '' || !/^[0-9]*$/.test(money) || parseFloat(money) <= 0) {
         window.alert('输入不合法！')
         return
     }
-    
-    let client= new net.Socket();
+
+    let client = new net.Socket();
     client.setEncoding('utf8')
     client.connect(admin_port, admin_host, () => {
         client.write(JSON.stringify({
@@ -91,7 +91,7 @@ deposit_confirm_dialog.addEventListener('click', (e) => {
     let result;
     client.on('data', (data) => {
         result = JSON.parse(data)
-        if(result.code != 0) {
+        if (result.code != 0) {
             window.alert('操作失败！' + result.msg)
         }
         deposit_dialog.close()
@@ -105,7 +105,7 @@ deposit_confirm_dialog.addEventListener('click', (e) => {
         return
     })
 
-    client.on('close', () => {})
+    client.on('close', () => { })
 })
 
 
@@ -126,12 +126,12 @@ withdraw_close_dialog.addEventListener('click', (e) => {
 })
 withdraw_confirm_dialog.addEventListener('click', (e) => {
     let money = withdraw_money.value
-    if(typeof money == 'undefined' || money == null || money == '' || !/^[0-9]*$/.test(money) || parseFloat(money) <= 0) {
+    if (typeof money == 'undefined' || money == null || money == '' || !/^[0-9]*$/.test(money) || parseFloat(money) <= 0) {
         window.alert('输入不合法！')
         return
     }
-    
-    let client= new net.Socket();
+
+    let client = new net.Socket();
     client.setEncoding('utf8')
     client.connect(admin_port, admin_host, () => {
         client.write(JSON.stringify({
@@ -143,7 +143,7 @@ withdraw_confirm_dialog.addEventListener('click', (e) => {
     let result;
     client.on('data', (data) => {
         result = JSON.parse(data)
-        if(result.code != 0) {
+        if (result.code != 0) {
             window.alert('操作失败！' + result.msg)
         }
         withdraw_dialog.close()
@@ -155,5 +155,5 @@ withdraw_confirm_dialog.addEventListener('click', (e) => {
         withdraw_dialog.close()
         return
     })
-    client.on('close',() => {});
+    client.on('close', () => { });
 })

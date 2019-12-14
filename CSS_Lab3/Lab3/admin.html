@@ -33,14 +33,16 @@
                 <th class="mdl-data-table__cell--non-numeric">余额</th>
                 <th class="mdl-data-table__cell--non-numeric">Select</th>
                 <th class="mdl-data-table__cell--non-numeric">Update</th>
+                <th class="mdl-data-table__cell--non-numeric">删除</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="data_table_body">
               <tr>
                 <td>1</td>
                 <td class="mdl-data-table__cell--non-numeric">The smart one</td>
                 <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="text"
                     value="40"></td>
+                <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
                 <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
                 <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
               </tr>
@@ -51,6 +53,7 @@
                     value="73"></td>
                 <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
                 <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
+                <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
               </tr>
               <tr>
                 <td>3</td>
@@ -59,12 +62,14 @@
                     value="58"></td>
                 <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
                 <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
+                <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
               </tr>
               <tr>
                 <td>4</td>
                 <td class="mdl-data-table__cell--non-numeric">The funny one</td>
                 <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="text"
                     value="74"></td>
+                <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
                 <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
                 <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox"></td>
               </tr>
@@ -93,6 +98,17 @@
     <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
       <button type="button" class="mdl-button" id="confirm_dialog_ok">允许</button>
       <button type="button" class="mdl-button close" id="confirm_dialog_no">不允许</button>
+    </div>
+  </dialog>
+
+  <dialog class="mdl-dialog" id="common_error_dialog">
+    <div class="mdl-dialog__content">
+      <p id='common_error_msg'>
+        无此用户！
+      </p>
+    </div>
+    <div class="mdl-dialog__actions">
+      <button type="button" id="common_error_back" class="mdl-button">返回</button>
     </div>
   </dialog>
 
