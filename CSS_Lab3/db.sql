@@ -21,7 +21,7 @@ FLUSH PRIVILEGES;
 CREATE USER 'ziyang'@'localhost' IDENTIFIED WITH mysql_native_password BY 'ziyang';
 CREATE USER 'exp'@'localhost' IDENTIFIED WITH mysql_native_password BY 'exp';
 
-GRANT select ON lab3.bank TO 'ziyang'@'localhost';
-GRANT select ON lab3.bank TO 'exp'@'localhost';
+GRANT select(currency), select(username), select(valid) ON lab3.bank TO 'ziyang'@'localhost';
+GRANT select(currency), select(username), select(valid) ON lab3.bank TO 'exp'@'localhost';
 
 FLUSH PRIVILEGES;

@@ -27,35 +27,38 @@ let connection = mysql.createConnection({
     database: 'lab3'
 })
 
+let logined = true
 connection.connect((error) => {
     if (error) {
         document.querySelector('#common_error_msg').innerHTML = '无此用户！'
         document.querySelector('#common_error_dialog').showModal()
+        logined = false
     }
 })
 
-let currency_select_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + username + '\' and valid=true'
-connection.query(currency_select_sql, (error, result) => {
-    if (error) {
-        document.querySelector('#common_error_msg').innerHTML = '出现未知错误！' + error
-        document.querySelector('#common_error_dialog').showModal()
-    } else if (result.length == 0) {
-        document.querySelector('#common_error_msg').innerHTML = '该用户条目未被添加至bank中！'
-        document.querySelector('#common_error_dialog').showModal()
-    } else {
-        currency.innerHTML = result[0].currency
-    }
-})
-
-document.querySelector('#refresh_currency').addEventListener('click', (e) => {
+function refresh_currency() {
+    let currency_select_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + username + '\' and valid=true'
     connection.query(currency_select_sql, (error, result) => {
-        if (result.length == 0) {
-            document.querySelector('#common_error_msg').innerHTML = '该用户条目未被添加至bank中！'
+        if (error) {
+            document.querySelector('#common_error_msg').innerHTML = '查询数据库错误！' + error
+            document.querySelector('#common_error_dialog').showModal()
+        } else if (!result || result.length == 0) {
+            document.querySelector('#common_error_msg').innerHTML = '无此用户！'
             document.querySelector('#common_error_dialog').showModal()
         } else {
             currency.innerHTML = result[0].currency
         }
     })
+}
+
+if(logined) {
+    refresh_currency()
+}
+
+
+
+document.querySelector('#refresh_currency').addEventListener('click', (e) => {
+    refresh_currency()
 })
 
 let deposit_btn = document.querySelector("#deposit")

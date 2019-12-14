@@ -19,7 +19,8 @@ let connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'root',
-  database: 'lab3'
+  database: 'lab3',
+  multipleStatements: true
 })
 
 connection.connect((error) => {
@@ -41,11 +42,11 @@ function render_row(data) {
   html = html.replace(new RegExp("@ID", "g"), data.id)
   html = html.replace(new RegExp("@NAME", "g"), data.username)
   html = html.replace(new RegExp("@CURRENCY", "g"), data.currency)
-  if(!data.Table_priv) {
-    data.Table_priv = ''
+  if (!data.Column_priv) {
+    data.Column_priv = ''
   }
-  html = html.replace("@SELECT", data.Table_priv.includes('Select') ? 'checked' : '')
-  html = html.replace("@UPDATE", data.Table_priv.includes('Update') ? 'checked' : '')
+  html = html.replace("@SELECT", data.Column_priv.includes('Select') ? 'checked' : '')
+  html = html.replace("@UPDATE", data.Column_priv.includes('Update') ? 'checked' : '')
   html = html.replace("@VALID", data.valid == 1 ? 'checked' : '')
   return html
 }
@@ -59,7 +60,7 @@ function render_table(data) {
 }
 
 function query_all() {
-  let query_all_info = 'SELECT lab3.bank.*,mysql.tables_priv.Table_priv FROM lab3.bank LEFT JOIN mysql.tables_priv ON lab3.bank.username = mysql.tables_priv.User ORDER BY lab3.bank.id'
+  let query_all_info = 'SELECT lab3.bank.*,mysql.columns_priv.Column_priv FROM lab3.bank LEFT JOIN mysql.columns_priv ON lab3.bank.username = mysql.columns_priv.User AND mysql.columns_priv.Column_name=\'currency\' ORDER BY lab3.bank.id'
   connection.query(query_all_info, (error, result) => {
     if (error) {
       document.querySelector('#common_error_msg').innerHTML = '未知错误！\n' + error
@@ -67,7 +68,6 @@ function query_all() {
     } else {
       if (result.length == 0) return
       else {
-        console.log(result)
         render_table(result)
         bind_event()
       }
@@ -95,21 +95,20 @@ function bind_event() {
 }
 
 function change_select_priv(name, tag) {
-  let param = [name]
-  if(tag.checked) {
-    let grant_select_priv_sql = 'GRANT SELECT ON lab3.bank TO \'?\'@\'localhost\';FLUSH PRIVILEGES;'
-    connection.query(grant_select_priv_sql, param, (error, result) => {
-      if(error) {
-        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法授予权限 SELECT 给 ' + name + ' ！\n' + error
+  if (tag.checked) {
+    let grant_select_priv_sql = 'GRANT SELECT(currency) ON lab3.bank TO \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
+    connection.query(grant_select_priv_sql, (error, result) => {
+      if (error) {
+        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法授予权限 SELECT(currency) 给 ' + name + ' ！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
       }
     })
   } else {
-    let revoke_select_priv_sql = 'REVOKE SELECT ON lab3.bank FROM \'?\'@\'localhost\';FLUSH PRIVILEGES;'
-    connection.query(revoke_select_priv_sql, param, (error, result) => {
-      if(error) {
-        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法收回权限 SELECT 从 ' + name + ' ！\n' + error
+    let revoke_select_priv_sql = 'REVOKE SELECT(currency) ON lab3.bank FROM \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
+    connection.query(revoke_select_priv_sql, (error, result) => {
+      if (error) {
+        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法收回权限 SELECT(currency) 从 ' + name + ' ！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
       }
@@ -118,21 +117,20 @@ function change_select_priv(name, tag) {
 }
 
 function change_update_priv(name, tag) {
-  param = [name]
-  if(tag.checked) {
-    let grant_update_priv_sql = 'GRANT UPDATE ON lab3.bank TO \'?\'@\'localhost\';FLUSH PRIVILEGES;'
-    connection.query(grant_update_priv_sql, param, (error, result) => {
-      if(error) {
-        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法授予权限 UPDATE 给 ' + name + ' ！\n' + error
+  if (tag.checked) {
+    let grant_update_priv_sql = 'GRANT UPDATE(currency) ON lab3.bank TO \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
+    connection.query(grant_update_priv_sql, (error, result) => {
+      if (error) {
+        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法授予权限 UPDATE(currency) 给 ' + name + ' ！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
       }
     })
   } else {
-    let revoke_update_priv_sql = 'REVOKE UPDATE ON lab3.bank FROM \'?\'@\'localhost\';FLUSH PRIVILEGES;'
-    connection.query(revoke_update_priv_sql, param, (error, result) => {
-      if(error) {
-        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法收回权限 UPDATE 从 ' + name + ' ！\n' + error
+    let revoke_update_priv_sql = 'REVOKE UPDATE(currency) ON lab3.bank FROM \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
+    connection.query(revoke_update_priv_sql, (error, result) => {
+      if (error) {
+        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法收回权限 UPDATE(currency) 从 ' + name + ' ！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
       }
@@ -141,7 +139,25 @@ function change_update_priv(name, tag) {
 }
 
 function change_valid(name, tag) {
-
+  if (tag.checked) {
+    let update_valid_sql = 'UPDATE lab3.bank SET valid=true WHERE username=\'' + name + '\''
+    connection.query(update_valid_sql, (error, result) => {
+      if (error) {
+        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法设置用户 ' + name + ' 为有效！\n' + error
+        document.querySelector('#common_error_dialog_noreturn').showModal()
+        query_all()
+      }
+    })
+  } else {
+    let revoke_valid_sql = 'UPDATE lab3.bank SET valid=false WHERE username=\'' + name + '\''
+    connection.query(revoke_valid_sql, (error, result) => {
+      if (error) {
+        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法设置用户 ' + name + ' 为无效！\n' + error
+        document.querySelector('#common_error_dialog_noreturn').showModal()
+        query_all()
+      }
+    })
+  }
 }
 
 let return_login = document.querySelector('#return_login')
@@ -149,6 +165,27 @@ return_login.addEventListener('click', (e) => {
   ipcRenderer.send('return_login')
   server.close()
 })
+
+function change_currency(name, currency) {
+  let return_code = 0
+  connection.beginTransaction((error) => {
+    if (error) {
+      document.querySelector('#common_error_msg_noreturn').innerHTML = '开启事务失败！\n' + error
+      document.querySelector('#common_error_dialog_noreturn').showModal()
+      return_code = -1
+    } else {
+      let update_valid_sql = 'UPDATE lab3.bank SET currency=' + currency + ' WHERE username=\'' + name + '\''
+      connection.query(update_valid_sql, (error, result) => {
+        if (error) {
+          document.querySelector('#common_error_msg_noreturn').innerHTML = '修改currency失败！\n' + error
+          document.querySelector('#common_error_dialog_noreturn').showModal()
+          return_code = -1
+        }
+      })
+    }
+  })
+  return return_code
+}
 
 document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
   confirm_dialog.close()
@@ -166,7 +203,6 @@ document.querySelector("#confirm_dialog_no").addEventListener('click', (e) => {
     money: current_msg.currency,
     msg: '操作被管理员拒绝'
   }))
-  current_user_socket.close()
 })
 
 let net = require('net')
@@ -176,23 +212,46 @@ let server = net.createServer((socket) => {
   socket.on('data', (data_str) => {
     let data = JSON.parse(data_str)
 
-    let personal_currency = find_currency_by_username(data.username)
-
-    if (data.operation == 'withdraw' && personal_currency > money) {
-      socket.write({
-        code: -1,
-        money: personal_currency
-      })
-    } else {
-      current_msg = data
-      current_msg.currency = personal_currency
-      current_user_socket = socket;
-      document.querySelector("#dialog_username").innerHTML = current_msg.username
-      document.querySelector("#dialog_operation").innerHTML = current_msg.operation
-      document.querySelector("#dialog_money").innerHTML = current_msg.money
-      document.querySelector("#dialog_currency").innerHTML = current_msg.currency
-      confirm_dialog.showModal()
-    }
+    let find_currency_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + data.username + '\'';
+    connection.query(find_currency_sql, (error, result) => {
+      if(error) {
+        socket.write(JSON.stringify({
+          code: -1,
+          money: current_msg.currency,
+          msg: '远程服务器错误'
+        }))
+        document.querySelector('#common_error_msg_noreturn').innerHTML = '查询curency失败！\n' + error
+        document.querySelector('#common_error_dialog_noreturn').showModal()
+      } else {
+        if(!result || result.length == 0) {
+          socket.write(JSON.stringify({
+            code: -1,
+            money: current_msg.currency,
+            msg: '远程服务器错误'
+          }))
+          document.querySelector('#common_error_msg_noreturn').innerHTML = '无此用户！\n' + error
+          document.querySelector('#common_error_dialog_noreturn').showModal()
+          return
+        }
+        let personal_currency = result[0].currency
+        if (data.operation == 'withdraw' && personal_currency > money) {
+          socket.write({
+            code: -1,
+            money: personal_currency,
+            msg: '余额不足！'
+          })
+        } else {
+          current_msg = data
+          current_msg.currency = personal_currency
+          current_user_socket = socket;
+          document.querySelector("#dialog_username").innerHTML = current_msg.username
+          document.querySelector("#dialog_operation").innerHTML = current_msg.operation
+          document.querySelector("#dialog_money").innerHTML = current_msg.money
+          document.querySelector("#dialog_currency").innerHTML = current_msg.currency
+          confirm_dialog.showModal()
+        }
+      }
+    })
 
   })
 }).listen(listen_port)
@@ -200,7 +259,22 @@ server.on('listening', function () {
   console.log("server listening:" + server.address().port);
 });
 
-// TODO 按照data中的username查找余额
 function find_currency_by_username(name) {
-  return 20
+  let find_currency_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + name + '\'';
+  let res = -1
+  async_query(find_currency_sql, (result) => {
+    res = result[0].currency
+  })
+  return res
+}
+
+function async_query(sql, func) {
+  connection.query(sql, (error, result) => {
+    if(error) {
+      document.querySelector('#common_error_msg_noreturn').innerHTML = '执行 ' + sql + ' 失败！\n' + error
+      document.querySelector('#common_error_dialog_noreturn').showModal()
+    } else {
+      return func(result)
+    }
+  })
 }
