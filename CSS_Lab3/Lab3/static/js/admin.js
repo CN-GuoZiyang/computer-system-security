@@ -41,6 +41,9 @@ function render_row(data) {
   html = html.replace(new RegExp("@ID", "g"), data.id)
   html = html.replace(new RegExp("@NAME", "g"), data.username)
   html = html.replace(new RegExp("@CURRENCY", "g"), data.currency)
+  if(!data.Table_priv) {
+    data.Table_priv = ''
+  }
   html = html.replace("@SELECT", data.Table_priv.includes('Select') ? 'checked' : '')
   html = html.replace("@UPDATE", data.Table_priv.includes('Update') ? 'checked' : '')
   html = html.replace("@VALID", data.valid == 1 ? 'checked' : '')
@@ -56,7 +59,7 @@ function render_table(data) {
 }
 
 function query_all() {
-  let query_all_info = 'SELECT id, username, currency, valid FROM lab3.bank,mysql.user WHERE lab3.bank.username = mysql.user.User ORDER BY id'
+  let query_all_info = 'SELECT lab3.bank.*,mysql.tables_priv.Table_priv FROM lab3.bank LEFT JOIN mysql.tables_priv ON lab3.bank.username = mysql.tables_priv.User ORDER BY lab3.bank.id'
   connection.query(query_all_info, (error, result) => {
     if (error) {
       document.querySelector('#common_error_msg').innerHTML = '未知错误！\n' + error
@@ -64,14 +67,6 @@ function query_all() {
     } else {
       if (result.length == 0) return
       else {
-        for(let i = 0; i < result.length; i ++) {
-          let query_priv = 'SELECT Table_priv FROM mysql.tables_priv WHERE `User`=\'' + result[i].username + '\''
-          connection.query(query_priv, (error, res) => {
-            console.log(res)
-            if(res.length == 0) result[i].Table_priv = ''
-            else result[i].Table_priv = res.Table_priv
-          })
-        }
         console.log(result)
         render_table(result)
         bind_event()
