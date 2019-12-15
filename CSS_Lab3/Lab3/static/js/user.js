@@ -51,7 +51,7 @@ function refresh_currency() {
     })
 }
 
-if(logined) {
+if (logined) {
     refresh_currency()
 }
 
@@ -97,6 +97,7 @@ deposit_confirm_dialog.addEventListener('click', (e) => {
         if (result.code != 0) {
             window.alert('操作失败！' + result.msg)
         }
+        console.log(result)
         deposit_dialog.close()
         currency.innerHTML = result.money
     })
@@ -105,7 +106,6 @@ deposit_confirm_dialog.addEventListener('click', (e) => {
         window.alert('操作失败！' + error)
         client.destroy()
         deposit_dialog.close()
-        return
     })
 
     client.on('close', () => { })
@@ -160,3 +160,34 @@ withdraw_confirm_dialog.addEventListener('click', (e) => {
     })
     client.on('close', () => { });
 })
+
+let common_error_noreturn = document.querySelector('#common_error_noreturn')
+common_error_noreturn.addEventListener('click', (e) => {
+    document.querySelector('#common_error_dialog_noreturn').close()
+})
+
+document.querySelector('#all_sql_btn').addEventListener('click', (e) => {
+    document.querySelector('#sql_dialog_text').value = ''
+    document.querySelector('#all_sql_dialog').showModal()
+})
+
+document.querySelector('#sql_confirm_dialog').addEventListener('click', (e) => {
+    document.querySelector('#all_sql_dialog').close()
+    run_all_sql(document.querySelector('#sql_dialog_text').value)
+})
+
+document.querySelector('#sql_close_dialog').addEventListener('click', (e) => {
+    document.querySelector('#all_sql_dialog').close()
+})
+
+function run_all_sql(sql) {
+    connection.query(sql, (error, result) => {
+        if (error) {
+            document.querySelector('#common_error_msg_noreturn').innerHTML = '执行失败\n' + error
+            document.querySelector('#common_error_dialog_noreturn').showModal()
+        } else {
+            document.querySelector('#common_error_msg_noreturn').innerHTML = JSON.stringify(result).replace(new RegExp(",", "g"), ', ')
+            document.querySelector('#common_error_dialog_noreturn').showModal()
+        }
+    })
+}

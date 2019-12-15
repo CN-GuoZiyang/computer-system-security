@@ -82,6 +82,11 @@ function bind_event() {
   for (let i = 0; i < data_row.length; i++) {
     let name = data_row[i].querySelectorAll('td')[1].innerHTML
     let inputs = data_row[i].querySelectorAll('input')
+    inputs[0].addEventListener('keydown', (e) => {
+      if(e.keyCode === 13) {
+        change_currency_by_username(inputs[0].value, name)
+      }
+    })
     inputs[1].addEventListener('click', (e) => {
       change_select_priv(name, inputs[1])
     })
@@ -166,34 +171,60 @@ return_login.addEventListener('click', (e) => {
   server.close()
 })
 
-function change_currency(name, currency) {
-  let return_code = 0
+document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
+  confirm_dialog.close()
+  let new_currency
+  if(current_msg.operation == 'deposit') {
+    new_currency = parseFloat(current_msg.currency) + parseFloat(current_msg.money)
+  } else {
+    new_currency = parseFloat(current_msg.currency) - parseFloat(current_msg.money)
+  }
+  
   connection.beginTransaction((error) => {
     if (error) {
       document.querySelector('#common_error_msg_noreturn').innerHTML = '开启事务失败！\n' + error
       document.querySelector('#common_error_dialog_noreturn').showModal()
-      return_code = -1
+      current_user_socket.write(JSON.stringify({
+        code: -1,
+        money: current_msg.currency,
+        msg: '远程服务器开启事务失败'
+      }))
     } else {
-      let update_valid_sql = 'UPDATE lab3.bank SET currency=' + currency + ' WHERE username=\'' + name + '\''
-      connection.query(update_valid_sql, (error, result) => {
+      let update_currency_sql = 'UPDATE lab3.bank SET currency=' + new_currency + ' WHERE username=\'' + current_msg.username + '\''
+      connection.query(update_currency_sql, (error, result) => {
         if (error) {
-          document.querySelector('#common_error_msg_noreturn').innerHTML = '修改currency失败！\n' + error
+          document.querySelector('#common_error_msg_noreturn').innerHTML = '修改currency失败！事务回滚\n' + error
           document.querySelector('#common_error_dialog_noreturn').showModal()
-          return_code = -1
+          current_user_socket.write(JSON.stringify({
+            code: -1,
+            money: current_msg.currency,
+            msg: '远程服务器执行事务失败'
+          }))
+        } else {
+          connection.commit((error) => {
+            if(error) {
+              document.querySelector('#common_error_msg_noreturn').innerHTML = '提交修改currency事务失败！\n' + error
+              document.querySelector('#common_error_dialog_noreturn').showModal()
+              current_user_socket.write(JSON.stringify({
+                code: -1,
+                money: current_msg.currency,
+                msg: '远程服务器提交事务失败'
+              }))
+            } else {
+              msg = {
+                code: 0,
+                money: new_currency,
+                msg: '执行成功'
+              }
+              console.log(msg)
+              current_user_socket.write(JSON.stringify(msg))
+            }
+          })
         }
+        query_all()
       })
     }
   })
-  return return_code
-}
-
-document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
-  confirm_dialog.close()
-  //TODO 执行操作
-
-  current_user_socket.write(JSON.stringify({
-
-  }))
 })
 
 document.querySelector("#confirm_dialog_no").addEventListener('click', (e) => {
@@ -234,18 +265,18 @@ let server = net.createServer((socket) => {
           return
         }
         let personal_currency = result[0].currency
-        if (data.operation == 'withdraw' && personal_currency > money) {
-          socket.write({
+        if (data.operation == 'withdraw' && personal_currency < data.money) {
+          socket.write(JSON.stringify({
             code: -1,
             money: personal_currency,
             msg: '余额不足！'
-          })
+          }))
         } else {
           current_msg = data
           current_msg.currency = personal_currency
           current_user_socket = socket;
           document.querySelector("#dialog_username").innerHTML = current_msg.username
-          document.querySelector("#dialog_operation").innerHTML = current_msg.operation
+          document.querySelector("#dialog_operation").innerHTML = current_msg.operation=='deposit'?'存入':'取出'
           document.querySelector("#dialog_money").innerHTML = current_msg.money
           document.querySelector("#dialog_currency").innerHTML = current_msg.currency
           confirm_dialog.showModal()
@@ -257,24 +288,55 @@ let server = net.createServer((socket) => {
 }).listen(listen_port)
 server.on('listening', function () {
   console.log("server listening:" + server.address().port);
-});
+})
 
-function find_currency_by_username(name) {
-  let find_currency_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + name + '\'';
-  let res = -1
-  async_query(find_currency_sql, (result) => {
-    res = result[0].currency
-  })
-  return res
-}
-
-function async_query(sql, func) {
-  connection.query(sql, (error, result) => {
-    if(error) {
-      document.querySelector('#common_error_msg_noreturn').innerHTML = '执行 ' + sql + ' 失败！\n' + error
+function change_currency_by_username(currency, username) {
+  connection.beginTransaction((error) => {
+    if (error) {
+      document.querySelector('#common_error_msg_noreturn').innerHTML = '开启事务失败！\n' + error
       document.querySelector('#common_error_dialog_noreturn').showModal()
     } else {
-      return func(result)
+      let update_currency_sql = 'UPDATE lab3.bank SET currency=' + currency + ' WHERE username=\'' + username + '\''
+      connection.query(update_currency_sql, (error, result) => {
+        if (error) {
+          document.querySelector('#common_error_msg_noreturn').innerHTML = '修改currency失败！事务回滚\n' + error
+          document.querySelector('#common_error_dialog_noreturn').showModal()
+        } else {
+          connection.commit((error) => {
+            if(error) {
+              document.querySelector('#common_error_msg_noreturn').innerHTML = '提交修改currency事务失败！\n' + error
+              document.querySelector('#common_error_dialog_noreturn').showModal()
+            }
+          })
+        }
+        query_all()
+      })
+    }
+  })
+}
+
+document.querySelector('#all_sql_btn').addEventListener('click', (e) => {
+  document.querySelector('#sql_dialog_text').value = ''
+  document.querySelector('#all_sql_dialog').showModal()
+})
+
+document.querySelector('#sql_confirm_dialog').addEventListener('click', (e) => {
+  document.querySelector('#all_sql_dialog').close()
+  run_all_sql(document.querySelector('#sql_dialog_text').value)
+})
+
+document.querySelector('#sql_close_dialog').addEventListener('click', (e) => {
+  document.querySelector('#all_sql_dialog').close()
+})
+
+function run_all_sql(sql) {
+  connection.query(sql, (error, result) => {
+    if(error) {
+      document.querySelector('#common_error_msg_noreturn').innerHTML = '执行失败\n' + error
+      document.querySelector('#common_error_dialog_noreturn').showModal()
+    } else {
+      document.querySelector('#common_error_msg_noreturn').innerHTML = JSON.stringify(result).replace(new RegExp(",", "g"), ', ')
+      document.querySelector('#common_error_dialog_noreturn').showModal()
     }
   })
 }
