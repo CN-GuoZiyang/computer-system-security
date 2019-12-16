@@ -1,5 +1,9 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, ipcMain, Menu} = require('electron')
+let logger = require('./static/js/logger')
+logger.init()
+
+logger = logger.logger
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -19,8 +23,10 @@ function createWindow () {
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 
+  logger.info('启动登陆页')
+
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -40,7 +46,8 @@ app.on('ready', createWindow)
 app.on('window-all-closed', function () {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') app.quit()
+  logger.info('退出程序')
+  app.quit()
 })
 
 app.on('activate', function () {
@@ -53,6 +60,7 @@ let currentUser = ''
 
 ipcMain.on('login', (event, arg) => {
   currentUser = arg
+  logger.info('用户以 ' + currentUser + ' 身份登陆')
   if(currentUser === 'admin') {
     mainWindow.loadFile('admin.html')
   } else {
@@ -61,6 +69,7 @@ ipcMain.on('login', (event, arg) => {
 })
 
 ipcMain.on('return_login', (event, arg) => {
+  logger.info('用户 ' + currentUser + ' 退出登陆')
   mainWindow.loadFile('index.html')
   currentUser = ''
 })

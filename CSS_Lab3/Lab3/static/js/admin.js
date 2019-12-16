@@ -1,5 +1,6 @@
 let ipcRenderer = require('electron').ipcRenderer
 let mysql = require('mysql')
+let logger = require('./logger').logger
 
 let current_msg
 let current_user_socket
@@ -27,6 +28,7 @@ connection.connect((error) => {
   if (error) {
     document.querySelector('#common_error_msg').innerHTML = '无法连接数据库！\n' + error
     document.querySelector('#common_error_dialog').showModal()
+    logger.error('连接数据库失败, ' + error)
   }
 })
 
@@ -65,6 +67,7 @@ function query_all() {
     if (error) {
       document.querySelector('#common_error_msg').innerHTML = '未知错误！\n' + error
       document.querySelector('#common_error_dialog').showModal()
+      logger.error('查询信息时出现未知错误, ' + error)
     } else {
       if (result.length == 0) return
       else {
@@ -104,18 +107,24 @@ function change_select_priv(name, tag) {
     let grant_select_priv_sql = 'GRANT SELECT(currency) ON lab3.bank TO \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
     connection.query(grant_select_priv_sql, (error, result) => {
       if (error) {
+        logger.error('授予SELECT(currency)权限给 ' + name + ' 失败！' + error)
         document.querySelector('#common_error_msg_noreturn').innerHTML = '无法授予权限 SELECT(currency) 给 ' + name + ' ！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
+      } else {
+        logger.info('授予SELECT(currency)权限给 ' + name)
       }
     })
   } else {
     let revoke_select_priv_sql = 'REVOKE SELECT(currency) ON lab3.bank FROM \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
     connection.query(revoke_select_priv_sql, (error, result) => {
       if (error) {
+        logger.error('收回SELECT(currency)权限从 ' + name + ' 失败！' + error)
         document.querySelector('#common_error_msg_noreturn').innerHTML = '无法收回权限 SELECT(currency) 从 ' + name + ' ！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
+      } else {
+        logger.info('收回SELECT(currency)权限从 ' + name)
       }
     })
   }
@@ -126,18 +135,24 @@ function change_update_priv(name, tag) {
     let grant_update_priv_sql = 'GRANT UPDATE(currency) ON lab3.bank TO \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
     connection.query(grant_update_priv_sql, (error, result) => {
       if (error) {
+        logger.error('授予UPDATE(currency)权限给 ' + name + ' 失败！' + error)
         document.querySelector('#common_error_msg_noreturn').innerHTML = '无法授予权限 UPDATE(currency) 给 ' + name + ' ！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
+      } else {
+        logger.info('授予UPDATE(currency)权限给 ' + name)
       }
     })
   } else {
     let revoke_update_priv_sql = 'REVOKE UPDATE(currency) ON lab3.bank FROM \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
     connection.query(revoke_update_priv_sql, (error, result) => {
       if (error) {
+        logger.error('收回UPDATE(currency)权限从 ' + name + ' 失败！' + error)
         document.querySelector('#common_error_msg_noreturn').innerHTML = '无法收回权限 UPDATE(currency) 从 ' + name + ' ！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
+      } else {
+        logger.info('收回UPDATE(currency)权限从 ' + name)
       }
     })
   }
@@ -148,18 +163,24 @@ function change_valid(name, tag) {
     let update_valid_sql = 'UPDATE lab3.bank SET valid=true WHERE username=\'' + name + '\''
     connection.query(update_valid_sql, (error, result) => {
       if (error) {
+        logger.error('将用户 ' + name + ' 置为有效失败！' + error)
         document.querySelector('#common_error_msg_noreturn').innerHTML = '无法设置用户 ' + name + ' 为有效！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
+      } else {
+        logger.error('将用户 ' + name + ' 置为有效')
       }
     })
   } else {
     let revoke_valid_sql = 'UPDATE lab3.bank SET valid=false WHERE username=\'' + name + '\''
     connection.query(revoke_valid_sql, (error, result) => {
       if (error) {
+        logger.error('将用户 ' + name + ' 置为无效失败！' + error)
         document.querySelector('#common_error_msg_noreturn').innerHTML = '无法设置用户 ' + name + ' 为无效！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
+      } else {
+        logger.error('将用户 ' + name + ' 置为无效')
       }
     })
   }
