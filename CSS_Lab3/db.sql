@@ -4,7 +4,7 @@ USE lab3;
 
 CREATE TABLE `bank`
 (
-    id int PRIMARY KEY,
+    id int PRIMARY KEY AUTO_INCREMENT,
     username varchar(255) UNIQUE,
     currency int NOT NULL,
     valid tinyint(1) NOT NULL

@@ -340,3 +340,41 @@ function run_all_sql(sql) {
     }
   })
 }
+
+document.querySelector('#add_btn').addEventListener('click', (e) => {
+  document.querySelector('#add_user_dialog').showModal()
+})
+
+document.querySelector('#add_close_dialog').addEventListener('click', (e) => {
+  document.querySelector('#add_username').value = ''
+  document.querySelector('#add_currency').value = ''
+  document.querySelector('#add_user_dialog').close()
+})
+
+document.querySelector('#add_confirm_dialog').addEventListener('click', (e) => {
+  let add_username = document.querySelector('#add_username').value
+  let add_currency = document.querySelector('#add_currency').value
+  let add_user_sql = 'DROP USER if EXISTS \'' + add_username + '\'@\'localhost\';CREATE USER \'' + add_username + '\'@\'localhost\' IDENTIFIED WITH mysql_native_password BY \'' + add_username + '\';GRANT select(currency), select(username), select(valid) ON lab3.bank TO \'' + add_username + '\'@\'localhost\';FLUSH PRIVILEGES;INSERT INTO lab3.bank(username, currency, valid) VALUES (\'' + add_username + '\', ' + add_currency + ', true);'
+  connection.beginTransaction((error) => {
+    if (error) {
+      document.querySelector('#common_error_msg_noreturn').innerHTML = '添加用户失败！开启事务失败！\n' + error
+      document.querySelector('#common_error_dialog_noreturn').showModal()
+    } else {
+      connection.query(add_user_sql, (error, result) => {
+        if (error) {
+          document.querySelector('#common_error_msg_noreturn').innerHTML = '添加用户失败！事务回滚\n' + error
+          document.querySelector('#common_error_dialog_noreturn').showModal()
+        } else {
+          connection.commit((error) => {
+            if(error) {
+              document.querySelector('#common_error_msg_noreturn').innerHTML = '添加用户事务失败！\n' + error
+              document.querySelector('#common_error_dialog_noreturn').showModal()
+            }
+          })
+        }
+        document.querySelector('#add_user_dialog').close()
+        query_all()
+      })
+    }
+  })
+})
