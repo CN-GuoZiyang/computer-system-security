@@ -1,6 +1,12 @@
 let ipcRenderer = require('electron').ipcRenderer
 let mysql = require('mysql')
-let logger = require('./logger').logger
+let log4js = require('log4js')
+let log_path = ipcRenderer.sendSync('get_log_path')
+log4js.configure({
+  appenders: { bank: { type: 'file', filename: log_path } },
+  categories: { default: { appenders: ['bank'], level: 'info' } }
+})
+const logger = log4js.getLogger('bank')
 
 let current_msg
 let current_user_socket
@@ -197,12 +203,15 @@ document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
   let new_currency
   if(current_msg.operation == 'deposit') {
     new_currency = parseFloat(current_msg.currency) + parseFloat(current_msg.money)
+    logger.info('用户 ' + current_msg.username + ' 发起事务：存入 ' + current_msg.money + ' 元')
   } else {
     new_currency = parseFloat(current_msg.currency) - parseFloat(current_msg.money)
+    logger.info('用户 ' + current_msg.username + ' 发起事务：取出 ' + current_msg.money + ' 元')
   }
   
   connection.beginTransaction((error) => {
     if (error) {
+      logger.error('修改用户 ' + current_msg.username + ' 余额失败：开启事务失败')
       document.querySelector('#common_error_msg_noreturn').innerHTML = '开启事务失败！\n' + error
       document.querySelector('#common_error_dialog_noreturn').showModal()
       current_user_socket.write(JSON.stringify({
@@ -214,6 +223,8 @@ document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
       let update_currency_sql = 'UPDATE lab3.bank SET currency=' + new_currency + ' WHERE username=\'' + current_msg.username + '\''
       connection.query(update_currency_sql, (error, result) => {
         if (error) {
+          logger.error('修改用户 ' + current_msg.username + ' 余额失败：数据库操作失败')
+          connection.rollback()
           document.querySelector('#common_error_msg_noreturn').innerHTML = '修改currency失败！事务回滚\n' + error
           document.querySelector('#common_error_dialog_noreturn').showModal()
           current_user_socket.write(JSON.stringify({
@@ -224,6 +235,7 @@ document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
         } else {
           connection.commit((error) => {
             if(error) {
+              logger.error('修改用户 ' + current_msg.username + ' 余额失败：数据库操作失败')
               document.querySelector('#common_error_msg_noreturn').innerHTML = '提交修改currency事务失败！\n' + error
               document.querySelector('#common_error_dialog_noreturn').showModal()
               current_user_socket.write(JSON.stringify({
@@ -232,6 +244,7 @@ document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
                 msg: '远程服务器提交事务失败'
               }))
             } else {
+              logger.info('用户 ' + current_msg.username + ' ' + current_msg.operation=='deposit'?'存入 ':'取出 ' + current_msg.money + ' 成功！余额 ' + new_currency + ' 元')
               msg = {
                 code: 0,
                 money: new_currency,
@@ -264,9 +277,12 @@ let server = net.createServer((socket) => {
   socket.on('data', (data_str) => {
     let data = JSON.parse(data_str)
 
+    logger.info('获得用户 ' + data.username + ' 请求 ' + data.operation=='deposit'?'存入 ':'取出 ' + data.money + ' 元')
+
     let find_currency_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + data.username + '\'';
     connection.query(find_currency_sql, (error, result) => {
       if(error) {
+        logger.error('获取用户 ' + data.username + ' 余额失败！' + error)
         socket.write(JSON.stringify({
           code: -1,
           money: current_msg.currency,
@@ -276,6 +292,7 @@ let server = net.createServer((socket) => {
         document.querySelector('#common_error_dialog_noreturn').showModal()
       } else {
         if(!result || result.length == 0) {
+          logger.error('获取用户 ' + data.username + ' 信息失败！')
           socket.write(JSON.stringify({
             code: -1,
             money: current_msg.currency,
@@ -287,6 +304,7 @@ let server = net.createServer((socket) => {
         }
         let personal_currency = result[0].currency
         if (data.operation == 'withdraw' && personal_currency < data.money) {
+          logger.error('用户 ' + data.username + ' 请求失败：余额不足')
           socket.write(JSON.stringify({
             code: -1,
             money: personal_currency,
@@ -308,25 +326,32 @@ let server = net.createServer((socket) => {
   })
 }).listen(listen_port)
 server.on('listening', function () {
-  console.log("server listening:" + server.address().port);
+  logger.info('服务器监听端口 ' + listen_port)
 })
 
 function change_currency_by_username(currency, username) {
+  logger.info('管理员尝试修改用户 ' + username + ' 余额为 ' + currency + '元')
   connection.beginTransaction((error) => {
     if (error) {
+      logger.error('修改用户 ' + username + ' 余额失败：开启事务失败！' + error)
       document.querySelector('#common_error_msg_noreturn').innerHTML = '开启事务失败！\n' + error
       document.querySelector('#common_error_dialog_noreturn').showModal()
     } else {
       let update_currency_sql = 'UPDATE lab3.bank SET currency=' + currency + ' WHERE username=\'' + username + '\''
       connection.query(update_currency_sql, (error, result) => {
         if (error) {
+          logger.error('修改用户 ' + username + ' 余额失败：执行事务失败！' + error)
+          connection.rollback()
           document.querySelector('#common_error_msg_noreturn').innerHTML = '修改currency失败！事务回滚\n' + error
           document.querySelector('#common_error_dialog_noreturn').showModal()
         } else {
           connection.commit((error) => {
             if(error) {
+              logger.error('修改用户 ' + username + ' 余额失败：提交事务失败！' + error)
               document.querySelector('#common_error_msg_noreturn').innerHTML = '提交修改currency事务失败！\n' + error
               document.querySelector('#common_error_dialog_noreturn').showModal()
+            } else {
+              logger.info('管理员成功修改用户 ' + username + ' 余额为 ' + currency + '元')
             }
           })
         }
@@ -351,11 +376,14 @@ document.querySelector('#sql_close_dialog').addEventListener('click', (e) => {
 })
 
 function run_all_sql(sql) {
+  logger.info('尝试执行SQL：' + sql)
   connection.query(sql, (error, result) => {
     if(error) {
+      logger.error('执行SQL失败：' + error)
       document.querySelector('#common_error_msg_noreturn').innerHTML = '执行失败\n' + error
       document.querySelector('#common_error_dialog_noreturn').showModal()
     } else {
+      logger.info('执行SQL成功！')
       document.querySelector('#common_error_msg_noreturn').innerHTML = JSON.stringify(result).replace(new RegExp(",", "g"), ', ')
       document.querySelector('#common_error_dialog_noreturn').showModal()
     }
@@ -375,21 +403,28 @@ document.querySelector('#add_close_dialog').addEventListener('click', (e) => {
 document.querySelector('#add_confirm_dialog').addEventListener('click', (e) => {
   let add_username = document.querySelector('#add_username').value
   let add_currency = document.querySelector('#add_currency').value
+  logger.info('尝试添加用户 ' + add_username + ' ，余额为 ' + add_currency + '元')
   let add_user_sql = 'DROP USER if EXISTS \'' + add_username + '\'@\'localhost\';CREATE USER \'' + add_username + '\'@\'localhost\' IDENTIFIED WITH mysql_native_password BY \'' + add_username + '\';GRANT select(currency), select(username), select(valid) ON lab3.bank TO \'' + add_username + '\'@\'localhost\';FLUSH PRIVILEGES;INSERT INTO lab3.bank(username, currency, valid) VALUES (\'' + add_username + '\', ' + add_currency + ', true);'
   connection.beginTransaction((error) => {
     if (error) {
+      logger.error('添加用户' + add_username + '失败！开启事务失败！' + error)
       document.querySelector('#common_error_msg_noreturn').innerHTML = '添加用户失败！开启事务失败！\n' + error
       document.querySelector('#common_error_dialog_noreturn').showModal()
     } else {
       connection.query(add_user_sql, (error, result) => {
         if (error) {
+          logger.error('添加用户' + add_username + '失败！执行事务失败！' + error)
+          connection.rollback()
           document.querySelector('#common_error_msg_noreturn').innerHTML = '添加用户失败！事务回滚\n' + error
           document.querySelector('#common_error_dialog_noreturn').showModal()
         } else {
           connection.commit((error) => {
             if(error) {
+              logger.error('添加用户' + add_username + '失败！提交事务失败！' + error)
               document.querySelector('#common_error_msg_noreturn').innerHTML = '添加用户事务失败！\n' + error
               document.querySelector('#common_error_dialog_noreturn').showModal()
+            } else {
+              logger.info('成功添加用户 ' + add_username + ' ，余额为 ' + add_currency + '元')
             }
           })
         }

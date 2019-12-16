@@ -1,17 +1,23 @@
-let log4js = require('log4js')
-let date = new Date().getTime()
+const log4js = require('log4js')
 
-log4js.configure({
-    appenders: { logger: { type: 'file', filename: './static/log/' + date + '.log' } },
-    categories: { default: { appenders: ['logger'], level: 'info' } }
-})
+class Logger {
 
-let logger = log4js.getLogger('logger')
+    constructor() {
+        this.log4js = require('log4js')
+        this.date = new Date().getTime()
+        console.log(this.date)
+        this.log4js.configure({
+            appenders: { bank: { type: 'file', filename: './static/log/' + this.date + '.log' } },
+            categories: { default: { appenders: ['bank'], level: 'info' } }
+        })
+    }
 
-function init() {
-    logger.info('日志记录开启')
+    static getInstance() {
+        if(!this.instance) {
+            this.instance = new Logger()
+        }
+        return this.instance.log4js.getLogger('bank')
+    }
 }
 
-module.exports.logger = logger
-
-exports.init = init
+module.exports = Logger

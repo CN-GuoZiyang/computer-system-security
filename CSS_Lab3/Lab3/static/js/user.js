@@ -3,6 +3,13 @@ let net = require('net')
 let mysql = require('mysql')
 let admin_port = 8080
 let admin_host = '127.0.0.1'
+let log4js = require('log4js')
+let log_path = ipcRenderer.sendSync('get_log_path')
+log4js.configure({
+  appenders: { bank: { type: 'file', filename: log_path } },
+  categories: { default: { appenders: ['bank'], level: 'info' } }
+})
+const logger = log4js.getLogger('bank')
 
 let username = ''
 let currency = document.querySelector('#currency')
@@ -30,6 +37,7 @@ let connection = mysql.createConnection({
 let logined = true
 connection.connect((error) => {
     if (error) {
+        logger.error('尝试登陆失败！无此用户：' + username)
         document.querySelector('#common_error_msg').innerHTML = '无此用户！'
         document.querySelector('#common_error_dialog').showModal()
         logined = false
@@ -40,9 +48,11 @@ function refresh_currency() {
     let currency_select_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + username + '\' and valid=true'
     connection.query(currency_select_sql, (error, result) => {
         if (error) {
+            logger.error('查询余额错误！' + error)
             document.querySelector('#common_error_msg').innerHTML = '查询数据库错误！' + error
             document.querySelector('#common_error_dialog').showModal()
         } else if (!result || result.length == 0) {
+            logger.error('查询余额错误！查询不到此用户信息！')
             document.querySelector('#common_error_msg').innerHTML = '无此用户！'
             document.querySelector('#common_error_dialog').showModal()
         } else {
@@ -82,6 +92,8 @@ deposit_confirm_dialog.addEventListener('click', (e) => {
         return
     }
 
+    logger.info('用户 ' + username + ' 尝试存入 ' + money + ' 元')
+
     let client = new net.Socket();
     client.setEncoding('utf8')
     client.connect(admin_port, admin_host, () => {
@@ -95,7 +107,10 @@ deposit_confirm_dialog.addEventListener('click', (e) => {
     client.on('data', (data) => {
         result = JSON.parse(data)
         if (result.code != 0) {
+            logger.warn('用户操作失败！' + result.msg)
             window.alert('操作失败！' + result.msg)
+        } else {
+            logger.info('用户操作成功！')
         }
         console.log(result)
         deposit_dialog.close()
@@ -134,6 +149,8 @@ withdraw_confirm_dialog.addEventListener('click', (e) => {
         return
     }
 
+    logger.info('用户 ' + username + ' 尝试取出 ' + money + ' 元')
+
     let client = new net.Socket();
     client.setEncoding('utf8')
     client.connect(admin_port, admin_host, () => {
@@ -147,7 +164,10 @@ withdraw_confirm_dialog.addEventListener('click', (e) => {
     client.on('data', (data) => {
         result = JSON.parse(data)
         if (result.code != 0) {
+            logger.warn('用户操作失败！' + result.msg)
             window.alert('操作失败！' + result.msg)
+        } else {
+            logger.info('用户操作成功！')
         }
         withdraw_dialog.close()
         currency.innerHTML = result.money
@@ -181,11 +201,14 @@ document.querySelector('#sql_close_dialog').addEventListener('click', (e) => {
 })
 
 function run_all_sql(sql) {
+    logger.info('尝试执行SQL：' + sql)
     connection.query(sql, (error, result) => {
         if (error) {
+            logger.error('尝试执行SQL失败！' + error)
             document.querySelector('#common_error_msg_noreturn').innerHTML = '执行失败\n' + error
             document.querySelector('#common_error_dialog_noreturn').showModal()
         } else {
+            logger.info('执行SQL成功！')
             document.querySelector('#common_error_msg_noreturn').innerHTML = JSON.stringify(result).replace(new RegExp(",", "g"), ', ')
             document.querySelector('#common_error_dialog_noreturn').showModal()
         }

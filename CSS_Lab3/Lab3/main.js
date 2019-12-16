@@ -1,9 +1,13 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, ipcMain, Menu} = require('electron')
-let logger = require('./static/js/logger')
-logger.init()
-
-logger = logger.logger
+const log4js = require('log4js')
+const date = new Date().getTime()
+const log_path = './static/log/' + date + '.log'
+log4js.configure({
+  appenders: { bank: { type: 'file', filename: log_path } },
+  categories: { default: { appenders: ['bank'], level: 'info' } }
+})
+const logger = log4js.getLogger('bank')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,7 +30,7 @@ function createWindow () {
   logger.info('启动登陆页')
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -76,4 +80,8 @@ ipcMain.on('return_login', (event, arg) => {
 
 ipcMain.on('getUser', (event) => {
   event.returnValue = currentUser
+})
+
+ipcMain.on('get_log_path', (event) => {
+  event.returnValue = log_path
 })

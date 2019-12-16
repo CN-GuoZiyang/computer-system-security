@@ -8,3 +8,4 @@ sudo rm ./passwd
 sudo chmod 666 ./aaa
 
 sudo rm ./capset
+sudo rm ./tryChangeTime
