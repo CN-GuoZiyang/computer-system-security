@@ -174,7 +174,7 @@ function change_valid(name, tag) {
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
       } else {
-        logger.error('将用户 ' + name + ' 置为有效')
+        logger.info('将用户 ' + name + ' 置为有效')
       }
     })
   } else {
@@ -186,7 +186,7 @@ function change_valid(name, tag) {
         document.querySelector('#common_error_dialog_noreturn').showModal()
         query_all()
       } else {
-        logger.error('将用户 ' + name + ' 置为无效')
+        logger.info('将用户 ' + name + ' 置为无效')
       }
     })
   }
