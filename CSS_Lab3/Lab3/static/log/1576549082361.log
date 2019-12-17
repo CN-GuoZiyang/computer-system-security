@@ -1,0 +1,29 @@
+[2019-12-17T10:18:02.512] [INFO] bank - 启动登陆页
+[2019-12-17T10:18:30.979] [INFO] bank - 用户以 admin 身份登陆
+[2019-12-17T10:18:31.498] [INFO] bank - 服务器监听端口 8080
+[2019-12-17T10:19:14.340] [INFO] bank - 取出 30 元
+[2019-12-17T10:19:21.037] [INFO] bank - 用户 ziyang 发起事务：存入 30 元
+[2019-12-17T10:19:21.062] [INFO] bank - 取出 30 成功！余额 160 元
+[2019-12-17T10:19:26.399] [INFO] bank - 取出 30 元
+[2019-12-17T10:19:39.637] [INFO] bank - 管理员尝试修改用户 ziyang 余额为 161元
+[2019-12-17T10:19:39.722] [INFO] bank - 管理员成功修改用户 ziyang 余额为 161元
+[2019-12-17T10:19:57.710] [ERROR] bank - 将用户 ziyang 置为无效
+[2019-12-17T10:20:08.372] [ERROR] bank - 将用户 ziyang 置为有效
+[2019-12-17T10:20:09.591] [INFO] bank - 收回SELECT(currency)权限从 ziyang
+[2019-12-17T10:20:24.033] [INFO] bank - 授予SELECT(currency)权限给 ziyang
+[2019-12-17T10:20:34.754] [INFO] bank - 尝试添加用户 yi ，余额为 123元
+[2019-12-17T10:20:34.798] [INFO] bank - 成功添加用户 yi ，余额为 123元
+[2019-12-17T10:20:42.605] [INFO] bank - 取出 30 元
+[2019-12-17T10:20:44.160] [INFO] bank - 用户 yi 发起事务：存入 30 元
+[2019-12-17T10:20:44.255] [INFO] bank - 取出 30 成功！余额 153 元
+[2019-12-17T10:21:06.569] [INFO] bank - 授予UPDATE(currency)权限给 ziyang
+[2019-12-17T10:22:26.396] [INFO] bank - 收回UPDATE(currency)权限从 ziyang
+[2019-12-17T10:22:46.584] [INFO] bank - 用户 admin 退出登陆
+[2019-12-17T10:22:59.797] [INFO] bank - 用户以 admin 身份登陆
+[2019-12-17T10:23:00.344] [INFO] bank - 服务器监听端口 8080
+[2019-12-17T10:23:10.952] [INFO] bank - 授予UPDATE(currency)权限给 ziyang
+[2019-12-17T10:23:12.681] [INFO] bank - 授予UPDATE(currency)权限给 exp
+[2019-12-17T10:23:13.586] [INFO] bank - 授予UPDATE(currency)权限给 yi
+[2019-12-17T10:23:15.321] [INFO] bank - 收回UPDATE(currency)权限从 ziyang
+[2019-12-17T10:23:16.338] [INFO] bank - 收回UPDATE(currency)权限从 exp
+[2019-12-17T10:23:17.239] [INFO] bank - 收回UPDATE(currency)权限从 yi
