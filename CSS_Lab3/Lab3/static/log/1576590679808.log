@@ -1,0 +1,16 @@
+[2019-12-17T21:51:19.917] [INFO] bank - 启动登陆页
+[2019-12-17T21:58:10.365] [INFO] bank - 用户以 admin 身份登陆
+[2019-12-17T21:58:10.806] [INFO] bank - 服务器监听端口 8080
+[2019-12-17T21:58:15.398] [INFO] bank - 授予SELECT(currency)权限给 ziyang
+[2019-12-17T21:58:16.445] [INFO] bank - 授予SELECT(currency)权限给 exp
+[2019-12-17T21:59:20.116] [INFO] bank - 用户 admin 退出登陆
+[2019-12-17T21:59:24.426] [INFO] bank - 用户以 ziyang 身份登陆
+[2019-12-17T21:59:24.831] [ERROR] bank - 查询余额错误！Error: ER_COLUMNACCESS_DENIED_ERROR: SELECT command denied to user 'ziyang'@'localhost' for column 'username' in table 'bank'
+[2019-12-17T21:59:30.626] [INFO] bank - 用户 ziyang 退出登陆
+[2019-12-17T22:02:45.720] [INFO] bank - 用户以 ziyang 身份登陆
+[2019-12-17T22:11:57.977] [INFO] bank - 用户 ziyang 尝试存入 50 元
+[2019-12-17T22:13:36.740] [INFO] bank - 用户操作成功！
+[2019-12-17T22:15:51.962] [INFO] bank - 用户 ziyang 退出登陆
+[2019-12-17T22:16:01.403] [INFO] bank - 用户以 ziyang 身份登陆
+[2019-12-17T22:16:01.806] [ERROR] bank - 查询余额错误！查询不到此用户信息！
+[2019-12-17T22:16:14.203] [INFO] bank - 用户 ziyang 退出登陆
