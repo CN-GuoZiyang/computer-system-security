@@ -1,0 +1,28 @@
+main {
+    background: linear-gradient(to right top, #EAF2F8, white)
+}
+
+.mdl-navigation__link {
+    cursor: pointer;
+}
+
+.mdl-navigation {
+    margin-left: 500px;
+}
+
+#data_table {
+    position: relative;
+    margin-top: 8%;
+    margin-left: 16%;
+}
+
+.mdl-textfield__input {
+    width: fit-content;
+    margin: 0
+}
+
+#add_btn { 
+    position: absolute;
+    bottom: 47px;
+    right: 47px;
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src *" />
+  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src *" />
+  <link rel="stylesheet" href="./static/css/material.min.css" />
+  <link rel="stylesheet" href="./static/css/admin.css" />
+  <title>管理员界面</title>
+</head>
+
+<body>
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+      <div class="mdl-layout__header-row">
+        <span class="mdl-layout-title">管理员面板</span>
+        <div class="mdl-layout-spacer"></div>
+        <nav class="mdl-navigation">
+          <a class="mdl-navigation__link" id="all_sql_btn">执行任意SQL</a>
+          <a class="mdl-navigation__link" id="return_login">返回登陆页</a>
+        </nav>
+      </div>
+    </header>
+    <main class="mdl-layout__content">
+      <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
+        <div class="page-content">
+
+          <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" id="data_table">
+            <thead>
+              <tr>
+                <th>id</th>
+                <th class="mdl-data-table__cell--non-numeric">姓名</th>
+                <th class="mdl-data-table__cell--non-numeric">余额</th>
+                <th class="mdl-data-table__cell--non-numeric">Select</th>
+                <th class="mdl-data-table__cell--non-numeric">Update</th>
+                <th class="mdl-data-table__cell--non-numeric">有效</th>
+              </tr>
+            </thead>
+            <tbody id="data_table_body">
+              
+            </tbody>
+          </table>
+
+        </div>
+      </section>
+      <section class="mdl-layout__tab-panel" id="fixed-tab-2">
+        <div class="page-content">
+
+          <h1>用户权限管理</h1>
+
+        </div>
+      </section>
+
+      <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="add_btn">
+        +
+      </button>
+
+    </main>
+  </div>
+
+  <dialog class="mdl-dialog" id="confirm_dialog">
+    <h4 class="mdl-dialog__title">请求操作</h4>
+    <div class="mdl-dialog__content">
+      <p>用户 <span id="dialog_username"></span> 请求 <span id="dialog_operation"></span> <span id="dialog_money"></span>元</p>
+      <p>该用户当前余额为 <span id="dialog_currency"></span></p>
+    </div>
+    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+      <button type="button" class="mdl-button" id="confirm_dialog_ok">允许</button>
+      <button type="button" class="mdl-button close" id="confirm_dialog_no">不允许</button>
+    </div>
+  </dialog>
+
+  <dialog class="mdl-dialog" id="common_error_dialog">
+    <div class="mdl-dialog__content">
+      <p id='common_error_msg'>
+      </p>
+    </div>
+    <div class="mdl-dialog__actions">
+      <button type="button" id="common_error_back" class="mdl-button">返回</button>
+    </div>
+  </dialog>
+
+  <dialog class="mdl-dialog" id="common_error_dialog_noreturn">
+    <div class="mdl-dialog__content">
+      <p id='common_error_msg_noreturn'>
+      </p>
+    </div>
+    <div class="mdl-dialog__actions">
+      <button type="button" id="common_error_noreturn" class="mdl-button">确定</button>
+    </div>
+  </dialog>
+
+  <dialog class="mdl-dialog" id="all_sql_dialog">
+    <h4 class="mdl-dialog__title">SQL</h4>
+    <div class="mdl-dialog__content">
+      <p>
+        在这里，你可以尝试执行任意SQL语句
+      </p>
+      <div class="mdl-textfield mdl-js-textfield">
+        <textarea class="mdl-textfield__input" id='sql_dialog_text' type="text" rows= "3" id="sample5"></textarea>
+        <label class="mdl-textfield__label" for="sample5">SQL语句HERE</label>
+      </div>
+    </div>
+    <div class="mdl-dialog__actions">
+      <button type="button" id="sql_confirm_dialog" class="mdl-button">确定</button>
+      <button type="button" id="sql_close_dialog" class="mdl-button">返回</button>
+    </div>
+  </dialog>
+
+  <dialog class="mdl-dialog" id="add_user_dialog">
+    <h4 class="mdl-dialog__title">添加用户</h4>
+    <div class="mdl-dialog__content">
+      <div class="mdl-textfield mdl-js-textfield">
+        <input class="mdl-textfield__input" type="text" id="add_username" />
+        <label class="mdl-textfield__label" for="add_username">用户名</label>
+      </div>
+      <div class="mdl-textfield mdl-js-textfield">
+        <input class="mdl-textfield__input" type="text" id="add_currency" />
+        <label class="mdl-textfield__label" for="add_currency">初始金额</label>
+      </div>
+    </div>
+    <div class="mdl-dialog__actions">
+      <button type="button" id="add_confirm_dialog" class="mdl-button">确定</button>
+      <button type="button" id="add_close_dialog" class="mdl-button">返回</button>
+    </div>
+  </dialog>
+
+</body>
+
+<script src="./static/js/material.min.js"></script>
+<script src="./static/js/admin.js"></script>
+
+</html>

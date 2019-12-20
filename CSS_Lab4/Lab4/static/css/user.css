@@ -1,0 +1,68 @@
+main {
+    background: linear-gradient(to right top, #EAF2F8, white)
+}
+
+.mdl-navigation__link {
+    cursor: pointer;
+}
+
+.mdl-navigation {
+    margin-left: 500px;
+}
+
+#userInfo {
+    text-align: center;
+    font-size: x-large;
+    margin-top: 5%;
+}
+
+#currency {
+    color: red;
+}
+
+.text_div {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.mdl-card {
+    margin: 0 auto;
+}
+
+#action_cards {
+    margin-top: 5%;
+}
+
+.my_icon {
+    font-size: 50px;
+}
+
+.action_title {
+    font-size: 50px;
+    margin: 0 auto;
+    -webkit-user-select: none;
+}
+
+#deposit {
+    background: #66BB6A;
+    transition: all 0.6s;
+    -webkit-transition: all 0.6s;
+}
+
+#deposit:hover {
+    background: #A5D6A7;
+}
+
+#withdraw {
+    background: #EF5350;
+    transition: all 0.6s;
+    -webkit-transition: all 0.6s;
+}
+
+#withdraw:hover {
+    background: #EF9A9A;
+}
+
+.mdl-card__supporting-text {
+    color: rgba(255,255,255,.7);
+}

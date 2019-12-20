@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src *; script-src 'self'; style-src-elem *"
+    />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src *; script-src 'self'; style-src-elem *"
+    />
+    <link rel="stylesheet" href="./static/css/material.min.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./static/css/user.css" />
+    <title>普通用户界面</title>
+  </head>
+
+  <body>
+    <!-- Always shows a header, even in smaller screens. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">用户面板</span>
+          <!-- Add spacer, to align navigation to the right -->
+          <div class="mdl-layout-spacer"></div>
+          <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" id="all_sql_btn">执行任意SQL</a>
+            <a class="mdl-navigation__link" id="return_login">返回登陆页</a>
+          </nav>
+        </div>
+      </header>
+      <main class="mdl-layout__content">
+        <div class="page-content">
+          <div class="mdl-grid" id="userInfo">
+            <div class="mdl-cell mdl-cell--12-col">
+              <div>
+                <div class="text_div">
+                  当前用户：<span id="username"></span>
+                </div>
+                <div class="text_div">
+                  当前余额：¥<span id="currency"></span>  <a class="material-icons" id="refresh_currency">refresh</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mdl-grid" id="action_cards">
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="mdl-card mdl-shadow--4dp" id="deposit">
+                <div class="mdl-card__title mdl-card--expand">
+                  <div class="action_title">
+                    <span>存钱</span
+                    ><span class="material-icons my_icon">arrow_upward</span>
+                  </div>
+                </div>
+                <div class="mdl-card__supporting-text">
+                  从用户的账户中加上对应的金额
+                </div>
+              </div>
+            </div>
+
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="mdl-card mdl-shadow--4dp" id="withdraw">
+                <div class="mdl-card__title mdl-card--expand">
+                  <div class="action_title">
+                    <span>取钱</span
+                    ><span class="material-icons my_icon">arrow_downward</span>
+                  </div>
+                </div>
+                <div class="mdl-card__supporting-text">
+                  从用户的账户中减去对应的金额
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <dialog class="mdl-dialog" id="deposit_dialog">
+      <div class="mdl-dialog__content">
+        <p>
+          请输入要存入的钱数：
+        </p>
+        <div
+          class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
+        >
+          <input class="mdl-textfield__input" type="text" id="deposit_money" />
+          <label class="mdl-textfield__label" for="deposit_money">money</label>
+        </div>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" id="deposit_confirm_dialog" class="mdl-button">
+          确定
+        </button>
+        <button type="button" id="deposit_close_dialog" class="mdl-button">返回</button>
+      </div>
+    </dialog>
+
+    <dialog class="mdl-dialog" id="withdraw_dialog">
+      <div class="mdl-dialog__content">
+        <p>
+          请输入要取出的钱数：
+        </p>
+        <div
+          class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
+        >
+          <input class="mdl-textfield__input" type="text" id="withdraw_money" />
+          <label class="mdl-textfield__label" for="withdraw_money">money</label>
+        </div>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" id="withdraw_confirm_dialog" class="mdl-button confirm_dialog">
+          确定
+        </button>
+        <button type="button" id="withdraw_close_dialog" class="mdl-button">返回</button>
+      </div>
+    </dialog>
+
+    <dialog class="mdl-dialog" id="common_error_dialog">
+      <div class="mdl-dialog__content">
+        <p id='common_error_msg'>
+          无此用户！
+        </p>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" id="common_error_back" class="mdl-button">返回</button>
+      </div>
+    </dialog>
+
+    <dialog class="mdl-dialog" id="common_error_dialog_noreturn">
+      <div class="mdl-dialog__content">
+        <p id='common_error_msg_noreturn'>
+        </p>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" id="common_error_noreturn" class="mdl-button">确定</button>
+      </div>
+    </dialog>
+
+    <dialog class="mdl-dialog" id="all_sql_dialog">
+      <h4 class="mdl-dialog__title">SQL</h4>
+      <div class="mdl-dialog__content">
+        <p>
+          在这里，你可以尝试执行任意SQL语句
+        </p>
+        <div class="mdl-textfield mdl-js-textfield">
+          <textarea class="mdl-textfield__input" id='sql_dialog_text' type="text" rows= "3" id="sample5"></textarea>
+          <label class="mdl-textfield__label" for="sample5">SQL语句HERE</label>
+        </div>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" id="sql_confirm_dialog" class="mdl-button">确定</button>
+        <button type="button" id="sql_close_dialog" class="mdl-button">返回</button>
+      </div>
+    </dialog>
+
+  </body>
+
+  <script src="./static/js/material.min.js"></script>
+  <script src="./static/js/user.js"></script>
+</html>

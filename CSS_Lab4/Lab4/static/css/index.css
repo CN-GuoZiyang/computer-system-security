@@ -1,0 +1,28 @@
+body {
+  background: linear-gradient(to right top, #EAF2F8, white)
+}
+
+.demo-card-wide.mdl-card {
+  width: 450px;
+}
+
+.demo-card-wide > .mdl-card__title {
+  color: #000;
+  height: 176px;
+  background: url('../img/loginBG.jpg') center / cover;
+}
+
+.mdl-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.floatLeft {
+  float: left;
+}
+
+.floatRight {
+  float: right;
+}
