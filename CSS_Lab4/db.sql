@@ -42,29 +42,6 @@ CREATE USER 'admin'@'localhost' IDENTIFIED WITH mysql_native_password BY 'admin'
 CREATE USER 'ziyang'@'localhost' IDENTIFIED WITH mysql_native_password BY 'ziyang';
 CREATE USER 'exp'@'localhost' IDENTIFIED WITH mysql_native_password BY 'exp';
 
-GRANT select ON lab4.bankuser TO 'admin'@'localhost';
-GRANT select(id), select(currency), update(currency) ON lab4.bankcurrency TO 'admin'@'localhost';
-GRANT select ON lab4.bankidentity TO 'admin'@'localhost';
-
-GRANT select ON lab4.bankuser TO 'ziyang'@'localhost';
-GRANT select ON lab4.bankcurrency TO 'ziyang'@'localhost';
-GRANT select ON lab4.bankidentity TO 'ziyang'@'localhost';
-
-GRANT select ON lab4.bankuser TO 'exp'@'localhost';
-GRANT select ON lab4.bankcurrency TO 'exp'@'localhost';
-GRANT select ON lab4.bankidentity TO 'exp'@'localhost';
-
-DROP PROCEDURE IF EXISTS login;
-DELIMITER $$
-CREATE PROCEDURE login(IN p_username varchar(255), OUT p_isadmin tinyint(1), OUT p_currency int)
-BEGIN
-    DECLARE p_id int;
-    SELECT id INTO p_id FROM lab4.bankuser WHERE username=p_username;
-    SELECT isadmin INTO p_isadmin FROM lab4.bankidentity WHERE id=p_id;
-    SELECT currency INTO p_currency FROM lab4.bankcurrency WHERE id=p_id;
-END$$
-DELIMITER ;
-
 DROP PROCEDURE IF EXISTS queryalluser;
 DELIMITER $$
 CREATE PROCEDURE queryalluser()
@@ -73,8 +50,56 @@ BEGIN
     FROM lab4.bankuser, lab4.bankidentity, lab4.bankcurrency 
     WHERE lab4.bankuser.id = lab4.bankcurrency.id 
     AND lab4.bankuser.id = lab4.bankidentity.id 
-    AND lab4.bankidentity.isadmin = 0;
+    AND lab4.bankidentity.isadmin = 0
+    AND lab4.bankuser.valid = true;
 END$$
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS changecurrencybyusername;
+DELIMITER $$
+CREATE PROCEDURE changecurrencybyusername(IN p_username varchar(255), IN p_currency int)
+BEGIN
+    DECLARE p_id int;
+    SELECT id INTO p_id FROM lab4.bankuser WHERE username=p_username AND valid=true;
+    UPDATE lab4.bankcurrency SET currency=p_currency WHERE id=p_id;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS querysingleusercurrency;
+DELIMITER $$
+CREATE PROCEDURE querysingleusercurrency(IN p_username varchar(255))
+BEGIN
+    DECLARE p_id int;
+    SELECT id INTO p_id FROM lab4.bankuser WHERE username=p_username AND valid=true;
+    SELECT currency FROM lab4.bankcurrency WHERE id=p_id;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS querysingleuseridentity;
+DELIMITER $$
+CREATE PROCEDURE querysingleuseridentity(IN p_username varchar(255))
+BEGIN
+    DECLARE p_id int;
+    SELECT id INTO p_id FROM lab4.bankuser WHERE username=p_username AND valid=true;
+    SELECT isadmin FROM lab4.bankidentity WHERE id=p_id;
+END$$
+DELIMITER ;
+
+GRANT select ON lab4.bankuser TO 'admin'@'localhost';
+GRANT select(id), select(currency), update(currency) ON lab4.bankcurrency TO 'admin'@'localhost';
+GRANT select ON lab4.bankidentity TO 'admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE lab4.queryalluser TO 'admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE lab4.changecurrencybyusername TO 'admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE lab4.querysingleusercurrency TO 'admin'@'localhost';
+
+GRANT select ON lab4.bankuser TO 'ziyang'@'localhost';
+GRANT select ON lab4.bankcurrency TO 'ziyang'@'localhost';
+GRANT select ON lab4.bankidentity TO 'ziyang'@'localhost';
+GRANT EXECUTE ON PROCEDURE lab4.querysingleusercurrency TO 'ziyang'@'localhost';
+
+GRANT select ON lab4.bankuser TO 'exp'@'localhost';
+GRANT select ON lab4.bankcurrency TO 'exp'@'localhost';
+GRANT select ON lab4.bankidentity TO 'exp'@'localhost';
+GRANT EXECUTE ON PROCEDURE lab4.querysingleusercurrency TO 'exp'@'localhost';
 
 FLUSH PRIVILEGES;
