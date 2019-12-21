@@ -41,8 +41,7 @@ connection.connect((error) => {
 function render_row(data) {
   let html = '<tr class="data_row"><td>@ID</td> \
   <td class="mdl-data-table__cell--non-numeric">@NAME</td> \
-  <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="text" \
-      value="@CURRENCY"></td> \
+  <td class="mdl-data-table__cell--non-numeric">@CURRENCY</td> \
   </tr>'
   html = html.replace(new RegExp("@ID", "g"), data.id)
   html = html.replace(new RegExp("@NAME", "g"), data.username)
@@ -88,10 +87,8 @@ document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
   let new_currency
   if(current_msg.operation == 'deposit') {
     new_currency = parseFloat(current_msg.currency) + parseFloat(current_msg.money)
-    logger.info('用户 ' + current_msg.username + ' 发起事务：存入 ' + current_msg.money + ' 元')
   } else {
     new_currency = parseFloat(current_msg.currency) - parseFloat(current_msg.money)
-    logger.info('用户 ' + current_msg.username + ' 发起事务：取出 ' + current_msg.money + ' 元')
   }
   
   connection.beginTransaction((error) => {
@@ -129,7 +126,7 @@ document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
                 msg: '远程服务器提交事务失败'
               }))
             } else {
-              logger.info('用户 ' + current_msg.username + ' ' + current_msg.operation=='deposit'?'存入 ':'取出 ' + current_msg.money + ' 成功！余额 ' + new_currency + ' 元')
+              logger.info('用户 ' + current_msg.username + ' ' + (current_msg.operation=='deposit'?'存入 ':'取出 ') + current_msg.money + ' 成功！余额 ' + new_currency + ' 元')
               msg = {
                 code: 0,
                 money: new_currency,
@@ -152,6 +149,7 @@ document.querySelector("#confirm_dialog_no").addEventListener('click', (e) => {
     money: current_msg.currency,
     msg: '操作被管理员拒绝'
   }))
+  logger.info('管理员拒绝了用户 ' + current_msg.username + ' 的操作')
 })
 
 let net = require('net')
@@ -161,7 +159,7 @@ let server = net.createServer((socket) => {
   socket.on('data', (data_str) => {
     let data = JSON.parse(data_str)
 
-    logger.info('获得用户 ' + data.username + ' 请求 ' + data.operation=='deposit'?'存入 ':'取出 ' + data.money + ' 元')
+    logger.info('获得用户 ' + data.username + ' 请求 ' + (data.operation=='deposit'?'存入 ':'取出 ') + data.money + ' 元')
 
     let find_currency_sql = 'use lab4; call querysingleusercurrency(\'' + data.username + '\');'
     connection.query(find_currency_sql, (error, result) => {
@@ -199,7 +197,7 @@ let server = net.createServer((socket) => {
           current_msg.currency = personal_currency
           current_user_socket = socket;
           document.querySelector("#dialog_username").innerHTML = current_msg.username
-          document.querySelector("#dialog_operation").innerHTML = current_msg.operation=='deposit'?'存入':'取出'
+          document.querySelector("#dialog_operation").innerHTML = (current_msg.operation=='deposit'?'存入':'取出')
           document.querySelector("#dialog_money").innerHTML = current_msg.money
           document.querySelector("#dialog_currency").innerHTML = current_msg.currency
           confirm_dialog.showModal()

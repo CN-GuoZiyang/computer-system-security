@@ -30,7 +30,7 @@ function createWindow () {
   logger.info('启动登陆页')
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -107,7 +107,7 @@ ipcMain.on('login', (event, arg) => {
 })
 
 ipcMain.on('return_login', (event, arg) => {
-  logger.info(isAdmin?'用户 ':'管理员 ' + currentUser + ' 退出登陆')
+  logger.info((isAdmin?'用户 ':'管理员 ') + currentUser + ' 退出登陆')
   currentUser = ''
   isAdmin = false
   mainWindow.loadFile('index.html')
