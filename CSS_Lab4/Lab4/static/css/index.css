@@ -19,8 +19,8 @@ body {
   transform: translate(-50%, -50%);
 }
 
-.floatLeft {
-  float: left;
+.mdl-card__actions {
+  text-align: center;
 }
 
 .floatRight {

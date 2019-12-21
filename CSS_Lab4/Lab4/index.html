@@ -17,29 +17,27 @@
         <h2 class="mdl-card__title-text"></h2>
       </div>
       <div class="mdl-card__supporting-text">
-        本程序为计算机系统安全实验三设计，模拟银行的简易数据库管理系统</br>
+        本程序为计算机系统安全实验四设计，模拟银行的简易数据库管理系统</br>
         <div class="floatRight">
           By Ziyang Guo
         </div>
       </div>
       <div class="mdl-card__actions mdl-card--border">
-        <a class="mdl-button mdl-button--primary mdl-js-button floatLeft" id="userLogin">
-          我是普通客户
-        </a>
-        <a class="mdl-button mdl-button--accent mdl-js-button floatRight" id="adminLogin">
-          我是管理员
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="userLogin">
+          登陆
         </a>
       </div>
     </div>
     <dialog class="mdl-dialog">
-      <h4 class="mdl-dialog__title">您的用户名：</h4>
+      <h4 class="mdl-dialog__title">登陆</h4>
       <div class="mdl-dialog__content">
-        <p>
-          限定用户名后，您只能查询到该用户名的信息
-        </p>
         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
           <input class="mdl-textfield__input" type="text" id="username">
           <label class="mdl-textfield__label" for="username">username</label>
+        </div>
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+          <input class="mdl-textfield__input" type="password" id="password">
+          <label class="mdl-textfield__label" for="password">password</label>
         </div>
       </div>
       <div class="mdl-dialog__actions">
@@ -47,6 +45,17 @@
         <button type="button" id="close_dialog" class="mdl-button">返回</button>
       </div>
     </dialog>
+
+    <dialog class="mdl-dialog" id="common_error_dialog_noreturn">
+      <div class="mdl-dialog__content">
+        <p id='common_error_msg_noreturn'>
+        </p>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" id="common_error_noreturn" class="mdl-button">确定</button>
+      </div>
+    </dialog>
+
   </div>
 </body>
 

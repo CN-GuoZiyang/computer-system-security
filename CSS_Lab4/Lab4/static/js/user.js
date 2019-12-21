@@ -31,7 +31,8 @@ let connection = mysql.createConnection({
     host: 'localhost',
     user: username,
     password: username,
-    database: 'lab3'
+    database: 'lab4',
+    multipleStatements: true
 })
 
 let logined = true
@@ -45,7 +46,7 @@ connection.connect((error) => {
 })
 
 function refresh_currency() {
-    let currency_select_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + username + '\' and valid=true'
+    let currency_select_sql = 'use lab4;call querysingleusercurrency(\'' + username + '\');'
     connection.query(currency_select_sql, (error, result) => {
         if (error) {
             logger.error('查询余额错误！' + error)
@@ -56,7 +57,8 @@ function refresh_currency() {
             document.querySelector('#common_error_msg').innerHTML = '无此用户！'
             document.querySelector('#common_error_dialog').showModal()
         } else {
-            currency.innerHTML = result[0].currency
+            currency.innerHTML = result[1][0].currency
+            console.log(result)
         }
     })
 }
@@ -64,7 +66,6 @@ function refresh_currency() {
 if (logined) {
     refresh_currency()
 }
-
 
 
 document.querySelector('#refresh_currency').addEventListener('click', (e) => {
@@ -185,32 +186,3 @@ let common_error_noreturn = document.querySelector('#common_error_noreturn')
 common_error_noreturn.addEventListener('click', (e) => {
     document.querySelector('#common_error_dialog_noreturn').close()
 })
-
-document.querySelector('#all_sql_btn').addEventListener('click', (e) => {
-    document.querySelector('#sql_dialog_text').value = ''
-    document.querySelector('#all_sql_dialog').showModal()
-})
-
-document.querySelector('#sql_confirm_dialog').addEventListener('click', (e) => {
-    document.querySelector('#all_sql_dialog').close()
-    run_all_sql(document.querySelector('#sql_dialog_text').value)
-})
-
-document.querySelector('#sql_close_dialog').addEventListener('click', (e) => {
-    document.querySelector('#all_sql_dialog').close()
-})
-
-function run_all_sql(sql) {
-    logger.info('尝试执行SQL：' + sql)
-    connection.query(sql, (error, result) => {
-        if (error) {
-            logger.error('尝试执行SQL失败！' + error)
-            document.querySelector('#common_error_msg_noreturn').innerHTML = '执行失败\n' + error
-            document.querySelector('#common_error_dialog_noreturn').showModal()
-        } else {
-            logger.info('执行SQL成功！')
-            document.querySelector('#common_error_msg_noreturn').innerHTML = JSON.stringify(result).replace(new RegExp(",", "g"), ', ')
-            document.querySelector('#common_error_dialog_noreturn').showModal()
-        }
-    })
-}

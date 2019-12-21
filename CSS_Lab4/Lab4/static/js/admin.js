@@ -26,7 +26,7 @@ let connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'root',
-  database: 'lab3',
+  database: 'lab4',
   multipleStatements: true
 })
 
@@ -43,19 +43,11 @@ function render_row(data) {
   <td class="mdl-data-table__cell--non-numeric">@NAME</td> \
   <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="text" \
       value="@CURRENCY"></td> \
-  <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox" @SELECT></td> \
-  <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox" @UPDATE></td> \
-  <td class="mdl-data-table__cell--non-numeric"><input class="mdl-textfield__input" type="checkbox" @VALID></td> \
-</tr>'
+  </tr>'
   html = html.replace(new RegExp("@ID", "g"), data.id)
   html = html.replace(new RegExp("@NAME", "g"), data.username)
   html = html.replace(new RegExp("@CURRENCY", "g"), data.currency)
-  if (!data.Column_priv) {
-    data.Column_priv = ''
-  }
-  html = html.replace("@SELECT", data.Column_priv.includes('Select') ? 'checked' : '')
-  html = html.replace("@UPDATE", data.Column_priv.includes('Update') ? 'checked' : '')
-  html = html.replace("@VALID", data.valid == 1 ? 'checked' : '')
+  
   return html
 }
 
@@ -68,7 +60,7 @@ function render_table(data) {
 }
 
 function query_all() {
-  let query_all_info = 'SELECT lab3.bank.*,mysql.columns_priv.Column_priv FROM lab3.bank LEFT JOIN mysql.columns_priv ON lab3.bank.username = mysql.columns_priv.User AND mysql.columns_priv.Column_name=\'currency\' ORDER BY lab3.bank.id'
+  let query_all_info = 'use lab4; call queryalluser();'
   connection.query(query_all_info, (error, result) => {
     if (error) {
       document.querySelector('#common_error_msg').innerHTML = '未知错误！\n' + error
@@ -85,112 +77,6 @@ function query_all() {
 }
 
 query_all()
-
-function bind_event() {
-  let data_row = document.querySelectorAll(".data_row")
-  for (let i = 0; i < data_row.length; i++) {
-    let name = data_row[i].querySelectorAll('td')[1].innerHTML
-    let inputs = data_row[i].querySelectorAll('input')
-    inputs[0].addEventListener('keydown', (e) => {
-      if(e.keyCode === 13) {
-        change_currency_by_username(inputs[0].value, name)
-      }
-    })
-    inputs[1].addEventListener('click', (e) => {
-      change_select_priv(name, inputs[1])
-    })
-    inputs[2].addEventListener('click', (e) => {
-      change_update_priv(name, inputs[2])
-    })
-    inputs[3].addEventListener('click', (e) => {
-      change_valid(name, inputs[3])
-    })
-  }
-}
-
-function change_select_priv(name, tag) {
-  if (tag.checked) {
-    let grant_select_priv_sql = 'GRANT SELECT(currency) ON lab3.bank TO \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
-    connection.query(grant_select_priv_sql, (error, result) => {
-      if (error) {
-        logger.error('授予SELECT(currency)权限给 ' + name + ' 失败！' + error)
-        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法授予权限 SELECT(currency) 给 ' + name + ' ！\n' + error
-        document.querySelector('#common_error_dialog_noreturn').showModal()
-        query_all()
-      } else {
-        logger.info('授予SELECT(currency)权限给 ' + name)
-      }
-    })
-  } else {
-    let revoke_select_priv_sql = 'REVOKE SELECT(currency) ON lab3.bank FROM \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
-    connection.query(revoke_select_priv_sql, (error, result) => {
-      if (error) {
-        logger.error('收回SELECT(currency)权限从 ' + name + ' 失败！' + error)
-        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法收回权限 SELECT(currency) 从 ' + name + ' ！\n' + error
-        document.querySelector('#common_error_dialog_noreturn').showModal()
-        query_all()
-      } else {
-        logger.info('收回SELECT(currency)权限从 ' + name)
-      }
-    })
-  }
-}
-
-function change_update_priv(name, tag) {
-  if (tag.checked) {
-    let grant_update_priv_sql = 'GRANT UPDATE(currency) ON lab3.bank TO \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
-    connection.query(grant_update_priv_sql, (error, result) => {
-      if (error) {
-        logger.error('授予UPDATE(currency)权限给 ' + name + ' 失败！' + error)
-        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法授予权限 UPDATE(currency) 给 ' + name + ' ！\n' + error
-        document.querySelector('#common_error_dialog_noreturn').showModal()
-        query_all()
-      } else {
-        logger.info('授予UPDATE(currency)权限给 ' + name)
-      }
-    })
-  } else {
-    let revoke_update_priv_sql = 'REVOKE UPDATE(currency) ON lab3.bank FROM \'' + name + '\'@\'localhost\';FLUSH PRIVILEGES'
-    connection.query(revoke_update_priv_sql, (error, result) => {
-      if (error) {
-        logger.error('收回UPDATE(currency)权限从 ' + name + ' 失败！' + error)
-        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法收回权限 UPDATE(currency) 从 ' + name + ' ！\n' + error
-        document.querySelector('#common_error_dialog_noreturn').showModal()
-        query_all()
-      } else {
-        logger.info('收回UPDATE(currency)权限从 ' + name)
-      }
-    })
-  }
-}
-
-function change_valid(name, tag) {
-  if (tag.checked) {
-    let update_valid_sql = 'UPDATE lab3.bank SET valid=true WHERE username=\'' + name + '\''
-    connection.query(update_valid_sql, (error, result) => {
-      if (error) {
-        logger.error('将用户 ' + name + ' 置为有效失败！' + error)
-        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法设置用户 ' + name + ' 为有效！\n' + error
-        document.querySelector('#common_error_dialog_noreturn').showModal()
-        query_all()
-      } else {
-        logger.info('将用户 ' + name + ' 置为有效')
-      }
-    })
-  } else {
-    let revoke_valid_sql = 'UPDATE lab3.bank SET valid=false WHERE username=\'' + name + '\''
-    connection.query(revoke_valid_sql, (error, result) => {
-      if (error) {
-        logger.error('将用户 ' + name + ' 置为无效失败！' + error)
-        document.querySelector('#common_error_msg_noreturn').innerHTML = '无法设置用户 ' + name + ' 为无效！\n' + error
-        document.querySelector('#common_error_dialog_noreturn').showModal()
-        query_all()
-      } else {
-        logger.info('将用户 ' + name + ' 置为无效')
-      }
-    })
-  }
-}
 
 let return_login = document.querySelector('#return_login')
 return_login.addEventListener('click', (e) => {
@@ -220,7 +106,7 @@ document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
         msg: '远程服务器开启事务失败'
       }))
     } else {
-      let update_currency_sql = 'UPDATE lab3.bank SET currency=' + new_currency + ' WHERE username=\'' + current_msg.username + '\''
+      let update_currency_sql = 'use lab4; call changecurrencybyusername(\'' + current_msg.username + '\', ' + new_currency + ');'
       connection.query(update_currency_sql, (error, result) => {
         if (error) {
           logger.error('修改用户 ' + current_msg.username + ' 余额失败：数据库操作失败')
@@ -279,7 +165,7 @@ let server = net.createServer((socket) => {
 
     logger.info('获得用户 ' + data.username + ' 请求 ' + data.operation=='deposit'?'存入 ':'取出 ' + data.money + ' 元')
 
-    let find_currency_sql = 'SELECT currency FROM lab3.bank WHERE username=\'' + data.username + '\'';
+    let find_currency_sql = 'use lab4; call querysingleusercurrency(\'' + data.username + '\');'
     connection.query(find_currency_sql, (error, result) => {
       if(error) {
         logger.error('获取用户 ' + data.username + ' 余额失败！' + error)
@@ -328,35 +214,3 @@ let server = net.createServer((socket) => {
 server.on('listening', function () {
   logger.info('服务器监听端口 ' + listen_port)
 })
-
-function change_currency_by_username(currency, username) {
-  logger.info('管理员尝试修改用户 ' + username + ' 余额为 ' + currency + '元')
-  connection.beginTransaction((error) => {
-    if (error) {
-      logger.error('修改用户 ' + username + ' 余额失败：开启事务失败！' + error)
-      document.querySelector('#common_error_msg_noreturn').innerHTML = '开启事务失败！\n' + error
-      document.querySelector('#common_error_dialog_noreturn').showModal()
-    } else {
-      let update_currency_sql = 'UPDATE lab3.bank SET currency=' + currency + ' WHERE username=\'' + username + '\''
-      connection.query(update_currency_sql, (error, result) => {
-        if (error) {
-          logger.error('修改用户 ' + username + ' 余额失败：执行事务失败！' + error)
-          connection.rollback()
-          document.querySelector('#common_error_msg_noreturn').innerHTML = '修改currency失败！事务回滚\n' + error
-          document.querySelector('#common_error_dialog_noreturn').showModal()
-        } else {
-          connection.commit((error) => {
-            if(error) {
-              logger.error('修改用户 ' + username + ' 余额失败：提交事务失败！' + error)
-              document.querySelector('#common_error_msg_noreturn').innerHTML = '提交修改currency事务失败！\n' + error
-              document.querySelector('#common_error_dialog_noreturn').showModal()
-            } else {
-              logger.info('管理员成功修改用户 ' + username + ' 余额为 ' + currency + '元')
-            }
-          })
-        }
-        query_all()
-      })
-    }
-  })
-}

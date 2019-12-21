@@ -30,7 +30,7 @@ function createWindow () {
   logger.info('启动登陆页')
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -61,21 +61,57 @@ app.on('activate', function () {
 })
 
 let currentUser = ''
+let isAdmin = false
+
+let mysql = require('mysql')
+let connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'root',
+  database: 'lab4',
+  multipleStatements: true
+})
+
+connection.connect()
 
 ipcMain.on('login', (event, arg) => {
   currentUser = arg
-  logger.info('用户以 ' + currentUser + ' 身份登陆')
-  if(currentUser === 'admin') {
-    mainWindow.loadFile('admin.html')
-  } else {
-    mainWindow.loadFile('user.html')
-  }
+  let queryIdentitySql = 'use lab4; call querysingleuseridentity(\'' + currentUser + '\');'
+  connection.query(queryIdentitySql, (error, res) => {
+    result = res[1]
+    console.log(result)
+    if(error) {
+      event.returnValue = -1
+      currentUser = ''
+      isAdmin = false
+      logger.error('身份认证SQL执行失败：' + error)
+    } else {
+      if(result.length == 0) {
+        event.returnValue = -2
+        currentUser = ''
+        isAdmin = false
+        logger.warn('客户端尝试以 ' + currentUser + ' 的身份登陆失败：无此用户！')
+      } else {
+        event.returnValue = 0
+        if(result[0].isadmin == 1) {
+          isAdmin = true
+          logger.info('管理员 ' + currentUser + ' 登陆成功！')
+          mainWindow.loadFile('admin.html')
+        } else {
+          isAdmin = false
+          logger.info('用户 ' + currentUser + ' 登陆成功！')
+          mainWindow.loadFile('user.html')
+        }
+      }
+    }
+  })
 })
 
 ipcMain.on('return_login', (event, arg) => {
-  logger.info('用户 ' + currentUser + ' 退出登陆')
-  mainWindow.loadFile('index.html')
+  logger.info(isAdmin?'用户 ':'管理员 ' + currentUser + ' 退出登陆')
   currentUser = ''
+  isAdmin = false
+  mainWindow.loadFile('index.html')
 })
 
 ipcMain.on('getUser', (event) => {
