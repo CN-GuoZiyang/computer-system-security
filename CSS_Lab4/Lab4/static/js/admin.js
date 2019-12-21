@@ -69,8 +69,7 @@ function query_all() {
     } else {
       if (result.length == 0) return
       else {
-        render_table(result)
-        bind_event()
+        render_table(result[1])
       }
     }
   })
@@ -136,7 +135,6 @@ document.querySelector("#confirm_dialog_ok").addEventListener('click', (e) => {
                 money: new_currency,
                 msg: '执行成功'
               }
-              console.log(msg)
               current_user_socket.write(JSON.stringify(msg))
             }
           })
@@ -177,7 +175,7 @@ let server = net.createServer((socket) => {
         document.querySelector('#common_error_msg_noreturn').innerHTML = '查询curency失败！\n' + error
         document.querySelector('#common_error_dialog_noreturn').showModal()
       } else {
-        if(!result || result.length == 0) {
+        if(!result[1] || result[1].length == 0) {
           logger.error('获取用户 ' + data.username + ' 信息失败！')
           socket.write(JSON.stringify({
             code: -1,
@@ -188,9 +186,9 @@ let server = net.createServer((socket) => {
           document.querySelector('#common_error_dialog_noreturn').showModal()
           return
         }
-        let personal_currency = result[0].currency
+        let personal_currency = result[1][0].currency
         if (data.operation == 'withdraw' && personal_currency < data.money) {
-          logger.error('用户 ' + data.username + ' 请求失败：余额不足')
+          logger.warn('用户 ' + data.username + ' 请求失败：余额不足')
           socket.write(JSON.stringify({
             code: -1,
             money: personal_currency,

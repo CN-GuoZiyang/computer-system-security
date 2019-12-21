@@ -79,7 +79,6 @@ ipcMain.on('login', (event, arg) => {
   let queryIdentitySql = 'use lab4; call querysingleuseridentity(\'' + currentUser + '\');'
   connection.query(queryIdentitySql, (error, res) => {
     result = res[1]
-    console.log(result)
     if(error) {
       event.returnValue = -1
       currentUser = ''

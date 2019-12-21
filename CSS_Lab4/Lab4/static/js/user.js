@@ -52,13 +52,12 @@ function refresh_currency() {
             logger.error('查询余额错误！' + error)
             document.querySelector('#common_error_msg').innerHTML = '查询数据库错误！' + error
             document.querySelector('#common_error_dialog').showModal()
-        } else if (!result || result.length == 0) {
+        } else if (!result[1] || result[1].length == 0) {
             logger.error('查询余额错误！查询不到此用户信息！')
             document.querySelector('#common_error_msg').innerHTML = '无此用户！'
             document.querySelector('#common_error_dialog').showModal()
         } else {
             currency.innerHTML = result[1][0].currency
-            console.log(result)
         }
     })
 }
@@ -66,7 +65,6 @@ function refresh_currency() {
 if (logined) {
     refresh_currency()
 }
-
 
 document.querySelector('#refresh_currency').addEventListener('click', (e) => {
     refresh_currency()
@@ -113,7 +111,6 @@ deposit_confirm_dialog.addEventListener('click', (e) => {
         } else {
             logger.info('用户操作成功！')
         }
-        console.log(result)
         deposit_dialog.close()
         currency.innerHTML = result.money
     })
