@@ -20,9 +20,3 @@ main {
     width: fit-content;
     margin: 0
 }
-
-#add_btn { 
-    position: absolute;
-    bottom: 47px;
-    right: 47px;
-}

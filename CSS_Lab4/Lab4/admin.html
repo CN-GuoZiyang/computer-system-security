@@ -17,7 +17,6 @@
         <span class="mdl-layout-title">管理员面板</span>
         <div class="mdl-layout-spacer"></div>
         <nav class="mdl-navigation">
-          <a class="mdl-navigation__link" id="all_sql_btn">执行任意SQL</a>
           <a class="mdl-navigation__link" id="return_login">返回登陆页</a>
         </nav>
       </div>
@@ -52,10 +51,6 @@
         </div>
       </section>
 
-      <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="add_btn">
-        +
-      </button>
-
     </main>
   </div>
 
@@ -88,41 +83,6 @@
     </div>
     <div class="mdl-dialog__actions">
       <button type="button" id="common_error_noreturn" class="mdl-button">确定</button>
-    </div>
-  </dialog>
-
-  <dialog class="mdl-dialog" id="all_sql_dialog">
-    <h4 class="mdl-dialog__title">SQL</h4>
-    <div class="mdl-dialog__content">
-      <p>
-        在这里，你可以尝试执行任意SQL语句
-      </p>
-      <div class="mdl-textfield mdl-js-textfield">
-        <textarea class="mdl-textfield__input" id='sql_dialog_text' type="text" rows= "3" id="sample5"></textarea>
-        <label class="mdl-textfield__label" for="sample5">SQL语句HERE</label>
-      </div>
-    </div>
-    <div class="mdl-dialog__actions">
-      <button type="button" id="sql_confirm_dialog" class="mdl-button">确定</button>
-      <button type="button" id="sql_close_dialog" class="mdl-button">返回</button>
-    </div>
-  </dialog>
-
-  <dialog class="mdl-dialog" id="add_user_dialog">
-    <h4 class="mdl-dialog__title">添加用户</h4>
-    <div class="mdl-dialog__content">
-      <div class="mdl-textfield mdl-js-textfield">
-        <input class="mdl-textfield__input" type="text" id="add_username" />
-        <label class="mdl-textfield__label" for="add_username">用户名</label>
-      </div>
-      <div class="mdl-textfield mdl-js-textfield">
-        <input class="mdl-textfield__input" type="text" id="add_currency" />
-        <label class="mdl-textfield__label" for="add_currency">初始金额</label>
-      </div>
-    </div>
-    <div class="mdl-dialog__actions">
-      <button type="button" id="add_confirm_dialog" class="mdl-button">确定</button>
-      <button type="button" id="add_close_dialog" class="mdl-button">返回</button>
     </div>
   </dialog>
 
