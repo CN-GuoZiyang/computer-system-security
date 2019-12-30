@@ -68,6 +68,7 @@ function query_all() {
     } else {
       if (result.length == 0) return
       else {
+        logger.info('管理员查询了所有用户的信息')
         render_table(result[1])
       }
     }
